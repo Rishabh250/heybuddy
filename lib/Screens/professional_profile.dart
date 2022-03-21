@@ -563,7 +563,8 @@ class _ProfessionalProfileState extends State<ProfessionalProfile> {
 
                                                                   // x,
                                                                   text6,
-                                                                  white(context)));
+                                                                  white(
+                                                                      context)));
                                                         }),
                                                   );
                                           }),
@@ -637,11 +638,15 @@ class _ProfessionalProfileState extends State<ProfessionalProfile> {
                                 onPressed: () {
                                   print(
                                       "phone is${output['user'][0]["phone"]}");
+                                  var fcmToken =
+                                      output['user'][0]['fcmtoken'].toString();
+                                  print("RRRRffff" + fcmToken.toString());
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => SlotBookTime(
                                                 i: output['user'][0]["phone"],
+                                                fcm: fcmToken,
                                               )));
                                 },
                                 style: ElevatedButton.styleFrom(

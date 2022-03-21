@@ -19,6 +19,20 @@ class _AllEventsState extends State<AllEvents> {
     super.initState();
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   var events;
   List event = [];
   getAllEvents() async {
@@ -46,6 +60,15 @@ class _AllEventsState extends State<AllEvents> {
           child: FutureBuilder(
               future: getAllEvents(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(100.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
                 return events == null
                     ? Container(
                         height: _heightScale * 800,
@@ -55,7 +78,7 @@ class _AllEventsState extends State<AllEvents> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: _heightScale * 40,
+                            height: _heightScale * 10,
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -78,6 +101,7 @@ class _AllEventsState extends State<AllEvents> {
                                 ),
                                 Text("All Events",
                                     style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
                                         fontSize: _widthScale * 18)),
                               ],
                             ),
@@ -90,6 +114,71 @@ class _AllEventsState extends State<AllEvents> {
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: event.isNotEmpty ? event.length : 0,
                               itemBuilder: (context, index) {
+                                var time = event[index]["meetingTime"];
+                                time = time.split(':');
+                                var hours = int.parse(time[0]);
+                                if (hours > 12) {
+                                  if (hours == 13) {
+                                    hours = 1;
+                                  }
+                                  if (hours == 14) {
+                                    hours = 2;
+                                  }
+                                  if (hours == 15) {
+                                    hours = 3;
+                                  }
+                                  if (hours == 16) {
+                                    hours = 4;
+                                  }
+                                  if (hours == 17) {
+                                    hours = 5;
+                                  }
+                                  if (hours == 18) {
+                                    hours = 6;
+                                  }
+                                  if (hours == 19) {
+                                    hours = 7;
+                                  }
+                                  if (hours == 20) {
+                                    hours = 8;
+                                  }
+                                  if (hours == 21) {
+                                    hours = 9;
+                                  }
+                                  if (hours == 22) {
+                                    hours = 10;
+                                  }
+                                  if (hours == 23) {
+                                    hours = 11;
+                                  }
+                                  if (hours == 24) {
+                                    hours = 0;
+                                  }
+                                }
+                                var noon;
+                                if (int.parse(time[0]) > 12) {
+                                  noon = "PM";
+                                }
+                                if (int.parse(time[0]) < 12) {
+                                  noon = "AM";
+                                }
+
+                                var finalTime = hours.toString() +
+                                    ":" +
+                                    time[1] +
+                                    " " +
+                                    noon;
+
+                                var date = event[index]["Date"];
+                                date = date.split('/');
+
+                                var mon = int.parse(date[1]);
+
+                                var finalDate = date[2] +
+                                    " " +
+                                    months[mon - 1] +
+                                    ', ' +
+                                    date[0];
                                 return Column(
                                   children: [
                                     Stack(
@@ -102,11 +191,11 @@ class _AllEventsState extends State<AllEvents> {
                                                 height: _heightScale * 197,
                                                 width: _widthScale * 315,
                                                 decoration: BoxDecoration(
-                                                    image: DecorationImage(
-                                                  image: AssetImage(
-                                                      'assets/pool.png'),
-                                                  fit: BoxFit.fill,
-                                                )),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    color: Color.fromARGB(
+                                                        255, 20, 100, 167)),
                                               )
                                             : Container(
                                                 margin: EdgeInsets.symmetric(
@@ -115,15 +204,12 @@ class _AllEventsState extends State<AllEvents> {
                                                 height: _heightScale * 197,
                                                 width: _widthScale * 315,
                                                 decoration: BoxDecoration(
-                                                    color: white(context)
-                                                        .withOpacity(0.39),
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                        image: NetworkImage(
-                                                          event[index]
-                                                              ['eventPic'],
-                                                        ),
-                                                        fit: BoxFit.cover)),
+                                                    color: Color.fromARGB(
+                                                        255, 20, 100, 167),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                20))),
                                                 //  BoxDecoration(
                                                 //     image: DecorationImage(
                                                 //   image:
@@ -181,8 +267,8 @@ class _AllEventsState extends State<AllEvents> {
                                             ),
                                             content(
                                                 "assets/cal.png",
-                                                "${event[index]["Date"]} ,"
-                                                    " ${event[index]["meetingTime"]}"),
+                                                "$finalDate ,"
+                                                    " $finalTime"),
                                             SizedBox(
                                               height: _heightScale * 5,
                                             ),

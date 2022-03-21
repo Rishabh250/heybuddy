@@ -7,36 +7,35 @@ class BecomeaProfessional {
 
     FormData formData = FormData.fromMap({
       // 'aspirantphone': professionalbecome,
-     
- 
     });
     var response;
-    try{
-    response = await dio.post(
-      'https://heybuddybackend.herokuapp.com/api/user/profile/becomeProfessional',
-      data: formData,
-      options: Options(
-        followRedirects: false,
-        validateStatus: (status) {
-          return status! < 500;
-        },
-        headers: {"x-access-token": tokeen},
-      ),
-    );
-    
-    // print('${response.toString()}');
+    try {
+      response = await dio.post(
+        'https://heybuddybackend.herokuapp.com/api/user/profile/becomeProfessional',
+        data: formData,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return status! < 500;
+          },
+          headers: {"x-access-token": tokeen},
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      print('Api...... : ${response.data}');
-     
-      return response.data;
-    } else if (response.statusCode == 400) {
-      print('Error code : ${response.statusCode}');
-       } else {
-      return null;
-    }}catch (err) {
-    print("betee");
-    print(err);
-  }
+      // print('${response.toString()}');
+
+      if (response.statusCode == 200) {
+        print('Api...... : ${response.data}');
+
+        return response.data;
+      } else if (response.statusCode == 400) {
+        print('Error code : ${response.statusCode}');
+      } else {
+        return null;
+      }
+    } catch (err) {
+      print("betee");
+      print(err);
+    }
   }
 }

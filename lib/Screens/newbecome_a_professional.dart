@@ -63,7 +63,7 @@ class _BecomeProfessionalFormFillState
     // becomepro = await BecomeaProfessional.professional(tkn);
     if (_schoolname.text.isEmpty) {
       const snackBar = SnackBar(
-        content: Text("Enter Your Company title "),
+        content: Text("Enter Your Schaool Name "),
         duration: Duration(milliseconds: 2000),
         backgroundColor: text6,
       );

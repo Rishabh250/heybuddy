@@ -1,6 +1,9 @@
 // import 'dart:html';
 
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/welcome.dart';
 import 'package:heybuddy/api/api_profile.dart';
@@ -9,10 +12,15 @@ import 'package:heybuddy/api/signup_api.dart';
 import 'package:heybuddy/api/unique_calendar.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../api/comment/comment_for_asp.dart';
+import '../widgets/custom_bar.dart';
 
 class ProfessionalAppointmentBooked extends StatefulWidget {
   var index;
-  ProfessionalAppointmentBooked({required this.index});
+  var getId;
+  ProfessionalAppointmentBooked({required this.index, required this.getId});
   // const AppointmentBooked({Key? key}) : super(key: key);
 
   @override
@@ -22,14 +30,67 @@ class ProfessionalAppointmentBooked extends StatefulWidget {
 
 class _ProfessionalAppointmentBookedState
     extends State<ProfessionalAppointmentBooked> {
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  bool openLink = false;
+  var _color = Colors.grey;
+  var finalTime;
+  var finalDate;
+  var day;
+  var month;
+  var year;
+  var link;
+  var getMin;
+  var getHour;
   @override
   void initState() {
-    // TODO: implement initState
+    _openLink();
     super.initState();
-    // get2ndtabapi();
     onTap();
     getDataProfile();
   }
+
+  TextEditingController _comment = TextEditingController();
+  var finalTime2;
+
+  _openLink() {
+    DateTime now = DateTime.now();
+    var minget = (DateTime.now().minute + 5).toString();
+    if (minget == "60") {
+      minget = "00";
+    }
+    var hourget = now.hour;
+    var linkTime;
+    if (day.toString()[0].contains("0")) {
+      day = day.toString()[1];
+    }
+
+    linkTime = hourget.toString() + ":" + minget.toString();
+    print("RRRRRRRR" + linkTime.toString());
+    print("RRRRRRRR" + meetTime.toString());
+
+    if (meetTime.toString() == linkTime.toString()) {
+      print("RRRRRRRR");
+      openLink = true;
+    }
+    if (openLink == true) {
+      _color = Colors.blue;
+    }
+  }
+
+  bool isLoading = false;
 
   var tkn = datam.read('f');
   var responseid;
@@ -54,6 +115,7 @@ class _ProfessionalAppointmentBookedState
   }
 
   var time;
+  var meetTime;
 
   var add = TimeOfDay.minutesPerHour / 2;
   String getText() {
@@ -113,7 +175,7 @@ class _ProfessionalAppointmentBookedState
       height: size.height * 0.03,
     );
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: white(context).withOpacity(0.6),
         elevation: 0,
@@ -127,7 +189,7 @@ class _ProfessionalAppointmentBookedState
           ),
         ),
         title: Text(
-          "Appointment",
+          "Session Details",
           style: GoogleFonts.poppins(
               color: whitebox(context),
               fontSize: _widthScale * 18,
@@ -140,6 +202,108 @@ class _ProfessionalAppointmentBookedState
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                var time = output['meetingTime'];
+                meetTime = output['meetingTime'];
+                link = output['meetingURL'];
+
+                time = time.split(':');
+                var hours = int.parse(time[0]);
+                if (hours > 12) {
+                  if (hours == 13) {
+                    hours = 1;
+                  }
+                  if (hours == 14) {
+                    hours = 2;
+                  }
+                  if (hours == 15) {
+                    hours = 3;
+                  }
+                  if (hours == 16) {
+                    hours = 4;
+                  }
+                  if (hours == 17) {
+                    hours = 5;
+                  }
+                  if (hours == 18) {
+                    hours = 6;
+                  }
+                  if (hours == 19) {
+                    hours = 7;
+                  }
+                  if (hours == 20) {
+                    hours = 8;
+                  }
+                  if (hours == 21) {
+                    hours = 9;
+                  }
+                  if (hours == 22) {
+                    hours = 10;
+                  }
+                  if (hours == 23) {
+                    hours = 11;
+                  }
+                  if (hours == 24) {
+                    hours = 0;
+                  }
+                }
+                var noon;
+                if (int.parse(time[0]) > 12) {
+                  noon = "PM";
+
+                  if (int.parse(time[0]) == 12) {
+                    noon = "PM";
+                  }
+                }
+                if (int.parse(time[0]) < 12) {
+                  noon = "AM";
+                } else {
+                  noon = "PM";
+                }
+                getMin = int.parse(time[1]);
+                getHour = int.parse(hours.toString());
+
+                var bookedDate = output['txndate'].split('-');
+
+                var bookmon2 = int.parse(bookedDate[1]);
+                var bookgetDate02 = bookedDate[2][0];
+                var bookgetDate12 = bookedDate[2][1];
+                var bookgetDate2 = bookgetDate02 + bookgetDate12;
+                var bookfinalDate2 = bookgetDate2 +
+                    " " +
+                    months[bookmon2 - 1] +
+                    ', ' +
+                    bookedDate[0];
+
+                finalTime = hours.toString() + ":" + time[1] + " " + noon;
+                var date2 = output['professionalResponseDate'].split('-');
+
+                var date = output['Date'].split('-');
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                day = getDate;
+                year = date[0];
+                var mon2 = int.parse(date[1]);
+                var getDate02 = date[2][0];
+                var getDate12 = date[2][1];
+                var getDate2 = getDate02 + getDate12;
+
+                var finalDate2 =
+                    getDate2 + " " + months[mon - 1] + ', ' + date2[0];
+                finalDate = getDate + " " + months[mon - 1] + ', ' + date[0];
+                _openLink();
+
                 return output == null
                     ? Container(
                         height: _heightScale * 650,
@@ -162,11 +326,7 @@ class _ProfessionalAppointmentBookedState
                                 height: _heightScale * 32,
                               ),
                               Appointment(
-                                  "Booking id: ",
-                                  output['orderId']
-                                      .toString()
-                                      .replaceRange(0, 6, ""),
-                                  text9),
+                                  "Booking id: ", output['orderId'], text9),
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
@@ -178,80 +338,200 @@ class _ProfessionalAppointmentBookedState
                                   future: getDataProfile(),
                                   builder: (context, snapShot) {
                                     return Appointment(
-                                        "Name: ",
-                                        output["Aspirant"] == responseid['_id']
-                                            ? output['professionalname'] != null
-                                                ? getCapitalizeStringaa(
-                                                    output['professionalname'])
-                                                : "No Detail"
-                                            : output['professionalname'] != null
-                                                ? getCapitalizeStringaa(
-                                                    output['aspirantname'])
-                                                : "No Detail",
+                                        "Aspirant Name: ",
+                                        output['aspirantAnonymous'] != "true"
+                                            ? getCapitalizeStringaa(
+                                                output['aspirantname'])
+                                            : "Anonymous",
                                         text9);
                                   }),
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
-                              Appointment(
-                                  "Status: ", output['status'], Colors.green),
+                              Row(
+                                children: [
+                                  Appointment("Status: ", output['status'],
+                                      Colors.green),
+                                  SizedBox(
+                                    width: _widthScale * 151,
+                                  ),
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          isLoading = !isLoading;
+                                        });
+                                      },
+                                      child: Icon(isLoading
+                                          ? Icons.arrow_drop_down_sharp
+                                          : Icons.arrow_drop_up))
+                                ],
+                              ),
+                              SizedBox(
+                                height: _heightScale * 5,
+                              ),
+                              isLoading
+                                  ? Container(
+                                      width: double.infinity,
+                                      height: _heightScale * 100,
+                                      color: white(context).withOpacity(0.7),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            height: _heightScale * 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: _widthScale * 10,
+                                              ),
+                                              // SizedBox(
+                                              //   width: MediaQuery.of(context).size.width * 0.08,
+                                              // ),
+                                              Text(
+                                                bookfinalDate2,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                " : Booking",
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _heightScale * 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: _widthScale * 10,
+                                              ),
+                                              // SizedBox(
+                                              //   width: MediaQuery.of(context).size.width * 0.08,
+                                              // ),
+                                              Text(
+                                                finalDate,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                " : Confirmed",
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _heightScale * 15,
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: _widthScale * 10,
+                                              ),
+                                              // SizedBox(
+                                              //   width: MediaQuery.of(context).size.width * 0.08,
+                                              // ),
+                                              Text(
+                                                finalDate2,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                " : Aspirant Response : ",
+                                                // resout[widget.index]['Date']
+                                                //     .toString()
+                                                //     .replaceRange(10, 24, ""),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                output['approvedbyprofessional']
+                                                    .toString()
+                                                    .toUpperCase(),
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _heightScale * 10,
+                                          ),
+                                          // Row(
+                                          //   children: [
+                                          //     SizedBox(
+                                          //       width: _widthScale * 10,
+                                          //     ),
+                                          //     // SizedBox(
+                                          //     //   width: MediaQuery.of(context).size.width * 0.08,
+                                          //     // ),
+                                          //     Text(
+                                          //       "Awating. professional Response... ",
+                                          //       style: GoogleFonts.poppins(
+                                          //         fontSize: _widthScale * 12,
+                                          //         color: black(context),
+                                          //         // fontWeight: FontWeight.w600
+                                          //       ),
+                                          //     ),
+                                          //     Text(
+                                          //       " - ${output['approvedbyaspirant']}",
+                                          //       style: GoogleFonts.poppins(
+                                          //           fontSize: _widthScale * 12,
+                                          //           color: black(context)),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
+
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
-                              Appointment(
-                                  "Date: ",
-                                  output['Date']
-                                      .toString()
-                                      .replaceRange(10, 24, ""),
-                                  text9),
+                              Appointment("Date: ", finalDate, text9),
                               SizedBox(
                                 height: _heightScale * 30,
                               ),
                               Row(
                                 children: [
                                   Text(
-                                    "Time Slot",
+                                    "Time Slot : ",
                                     style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
                                         fontSize: _widthScale * 16,
                                         color: text9),
                                   ),
+                                  Appointment(
+                                      "",
+                                      output['meetingTime'] == ""
+                                          ? ""
+                                          : finalTime,
+                                      // .toString(),
+                                      // .replaceRange(10, 24, ""),
+                                      text9),
                                 ],
                               ),
                               // spacevert,
                               SizedBox(
                                 height: _heightScale * 30,
                               ),
-                              // Container(
-                              //   //  margin: EdgeInsets.only(left: 16, right: 15),
-                              //   height: _heightScale * 56,
-                              //   width: double.maxFinite,
-                              //   decoration: BoxDecoration(
-                              //     color: white.withOpacity(0.5),
-                              //     borderRadius: BorderRadius.all(
-                              //         Radius.circular(_widthScale * 6)),
-                              //   ),
-                              //   child: InkWell(
-                              //     onTap: () {
-                              //       pickTime(context);
-                              //     },
-                              //     child: ListTile(
-                              //       title: Text(
-                              //         "12:00 - 12:30",
-                              //         style: GoogleFonts.poppins(
-                              //             fontSize: _widthScale * 18,
-                              //             color: col3),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              Appointment(
-                                  "",
-                                  output['meetingTime'] == ""
-                                      ? ""
-                                      : output['meetingTime'],
-                                  // .toString(),
-                                  // .replaceRange(10, 24, ""),
-                                  text9),
                             ],
                           ),
                           // ),
@@ -284,26 +564,256 @@ class _ProfessionalAppointmentBookedState
                           SizedBox(
                             height: _heightScale * 20,
                           ),
-                          // Container(
-                          //   width: double.infinity,
-                          //   height: _widthScale * 56,
-                          //   child: ElevatedButton(
-                          //       onPressed: () {},
-                          //       style: ElevatedButton.styleFrom(
-                          //         primary: text6,
-                          //         shape: new RoundedRectangleBorder(
-                          //           borderRadius: new BorderRadius.circular(
-                          //               _widthScale * 10.0),
-                          //         ),
-                          //       ),
-                          //       child: Text(
-                          //         'Join Meeting',
-                          //         style: GoogleFonts.poppins(
-                          //           textStyle:
-                          //               TextStyle(fontSize: _widthScale * 18),
-                          //         ),
-                          //       )),
-                          // ),
+                          FutureBuilder(
+                              future: onTap(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Container();
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      FutureBuilder(
+                                          future: onTap(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Container();
+                                            }
+                                            var time = output['meetingTime'];
+                                            var getMeet =
+                                                time.toString().split(':');
+                                            var meetHour = getMeet[0];
+
+                                            var date =
+                                                output['Date'].split('-');
+
+                                            var mon = int.parse(date[1]);
+                                            var getDate0 = date[2][0];
+                                            var getDate1 = date[2][1];
+                                            var getDate = getDate0 + getDate1;
+
+                                            if (int.parse(getDate) ==
+                                                    DateTime.now().day &&
+                                                DateTime.now().hour ==
+                                                    int.parse(meetHour)) {
+                                              openLink = true;
+                                              _color = Colors.blue;
+                                            }
+
+                                            return InkWell(
+                                              onTap: () {
+                                                {
+                                                  if (openLink == true) {
+                                                    launch(link.toString());
+                                                  } else {
+                                                    return null;
+                                                  }
+                                                }
+                                              },
+                                              child: Container(
+                                                  height: 50,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.4,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color: openLink == true
+                                                          ? Colors.blue
+                                                          : Colors.grey),
+                                                  child: Center(
+                                                    child: Text("Join meeting",
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                                fontSize:
+                                                                    _widthScale *
+                                                                        14,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500)),
+                                                  )),
+                                            );
+                                          }),
+                                      output['commentforaspirant'] == ""
+                                          ? Spacer()
+                                          : SizedBox(),
+                                      FutureBuilder(
+                                          future: getDataProfile(),
+                                          builder: ((context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Container();
+                                            }
+                                            print(output['commentforaspirant']);
+                                            return output[
+                                                        'commentforaspirant'] ==
+                                                    ""
+                                                ? InkWell(
+                                                    onTap: () {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (builder) {
+                                                            return AlertDialog(
+                                                              content:
+                                                                  Container(
+                                                                height: 400,
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .transparent,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8)),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              2),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      TextField(
+                                                                        controller:
+                                                                            _comment,
+                                                                        textAlign:
+                                                                            TextAlign.left,
+                                                                        maxLines:
+                                                                            15,
+                                                                        keyboardType:
+                                                                            TextInputType.text,
+                                                                        decoration:
+                                                                            InputDecoration(
+                                                                          hintText:
+                                                                              'Notes for Aspirant',
+                                                                          hintStyle:
+                                                                              TextStyle(fontSize: 16),
+                                                                          border:
+                                                                              OutlineInputBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(8),
+                                                                            borderSide:
+                                                                                BorderSide(
+                                                                              width: 1,
+                                                                            ),
+                                                                          ),
+                                                                          filled:
+                                                                              true,
+                                                                          contentPadding:
+                                                                              EdgeInsets.all(16),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            20,
+                                                                      ),
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          if (_comment
+                                                                              .text
+                                                                              .isEmpty) {
+                                                                            const snackBar =
+                                                                                SnackBar(
+                                                                              content: Text("Notes can't be empty"),
+                                                                              duration: Duration(milliseconds: 2000),
+                                                                              backgroundColor: text6,
+                                                                            );
+                                                                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                                          } else {
+                                                                            sendNotes(widget.getId,
+                                                                                _comment.text.toString());
+                                                                            _comment.clear();
+                                                                            Get.offAll(() =>
+                                                                                Nav1(selectedIndex: 1));
+                                                                          }
+                                                                        },
+                                                                        child: Container(
+                                                                            decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              color: Colors.blue,
+                                                                            ),
+                                                                            height: 50,
+                                                                            width: MediaQuery.of(context).size.width * 0.8,
+                                                                            child: Center(
+                                                                              child: Text("Send Notes", style: GoogleFonts.poppins(fontSize: _widthScale * 16, color: black(context), fontWeight: FontWeight.w600)),
+                                                                            )),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            );
+                                                          });
+                                                    },
+                                                    child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          color: Colors.blue,
+                                                        ),
+                                                        height: 50,
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.4,
+                                                        child: Center(
+                                                          child: Text(
+                                                              "Send Notes",
+                                                              style: GoogleFonts.poppins(
+                                                                  fontSize:
+                                                                      _widthScale *
+                                                                          12,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600)),
+                                                        )),
+                                                  )
+                                                : Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color: Color.fromARGB(
+                                                          255, 130, 147, 161),
+                                                    ),
+                                                    height: 50,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.9,
+                                                    child: Center(
+                                                      child: Text(
+                                                          "Aspirant has recevied your notes",
+                                                          style: GoogleFonts.poppins(
+                                                              fontSize:
+                                                                  _widthScale *
+                                                                      12,
+                                                              color: black(
+                                                                  context),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600)),
+                                                    ));
+                                          }))
+                                    ],
+                                  ),
+                                );
+                              })
                         ],
                       );
               }),

@@ -19,9 +19,11 @@ class _SkillToUserState extends State<SkillToUser> {
   var response;
   _onSubmit(BuildContext context) async {
     response = await Skills.userSkills(widget.name);
-    setState(() {
-      responses = response;
-    });
+    if (mounted) {
+      setState(() {
+        responses = response;
+      });
+    }
   }
 
   String getCapitalizeString(String input) {
@@ -203,7 +205,8 @@ class _SkillToUserState extends State<SkillToUser> {
                   ? isPress == true
                       ? text6.withOpacity(0.1)
                       : white(context).withOpacity(0.39)
-                  : white(context).withOpacity(0.39), // white.withOpacity(0.39),
+                  : white(context)
+                      .withOpacity(0.39), // white.withOpacity(0.39),
               borderRadius: BorderRadius.all(Radius.circular(_widthScale * 20)),
             ),
             child: Row(
@@ -382,8 +385,8 @@ class _SkillToUserState extends State<SkillToUser> {
                 child: Text(
                   "Connect",
                   style: GoogleFonts.poppins(
-                    textStyle:
-                        TextStyle(fontSize: _widthScale * 18, color: white(context)),
+                    textStyle: TextStyle(
+                        fontSize: _widthScale * 18, color: white(context)),
                   ),
                 )),
           ),

@@ -19,14 +19,16 @@ var tokenProfile;
 final datam = GetStorage();
 
 class SignIn {
-  static Future signIn(var email, var password,var tknn) async {
+  static Future signIn(var email, var password, var tknn) async {
     print('SignUp');
     var dio = Dio();
+
+    print("FCMTOKEN" + "$tknn");
 
     FormData formData = FormData.fromMap({
       'email': email,
       'password': password,
-      'fcmtoken':tknn,
+      'fcmtoken': tknn,
     });
 
     var response = await dio.post(

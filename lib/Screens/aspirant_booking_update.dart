@@ -49,6 +49,20 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
     return '${str[0].toUpperCase()}${str.substring(1)}';
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   @override
   Widget build(BuildContext context) {
     const double kDesignWidth = 375;
@@ -74,7 +88,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
       height: size.height * 0.03,
     );
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: white(context).withOpacity(0.6), //backgroundColor,
         elevation: 0,
@@ -88,7 +102,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
           ),
         ),
         title: Text(
-          "Appointment",
+          "Session Details",
           style: GoogleFonts.poppins(
               color: whitebox(context),
               fontSize: _widthScale * 18,
@@ -101,6 +115,22 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                var date = output['Date'].split('-');
+
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                var finalDate =
+                    getDate + " " + months[mon - 1] + ', ' + date[0];
                 return output == null
                     ? Container(
                         height: _heightScale * 650,
@@ -117,12 +147,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                           SizedBox(
                             height: _heightScale * 32,
                           ),
-                          Appointment(
-                              "Booking id: ",
-                              output['orderId']
-                                  .toString()
-                                  .replaceRange(0, 6, ""),
-                              text9),
+                          Appointment("Booking id: ", output['orderId'], text9),
                           SizedBox(
                             height: _heightScale * 32,
                           ),
@@ -137,11 +162,17 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                           ),
 
                           Appointment(
-                              "Name: ",
-                              output['professionalname'] != null
-                                  ? getCapitalizeStringaa(
-                                      output['professionalname'])
-                                  : "No Detail",
+                              "Professional Name: ",
+                              output['isAspirantAnonymous'] == "true"
+                                  ? "Anonymous"
+                                  : output['professionalname'] != null
+                                      ? getCapitalizeStringaa(
+                                          output['professionalname'])
+                                      : "No Detail",
+                              // : output['professionalname'] != null
+                              //     ? getCapitalizeStringaa(
+                              //         output['aspirantname'])
+                              //     : "No Detail",
                               text9),
                           SizedBox(
                             height: _heightScale * 32,
@@ -186,9 +217,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                                           //   width: MediaQuery.of(context).size.width * 0.08,
                                           // ),
                                           Text(
-                                            output['Date']
-                                                .toString()
-                                                .replaceRange(10, 24, ""),
+                                            finalDate,
                                             style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 12,
                                               color: black(context),
@@ -215,10 +244,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                                           //   width: MediaQuery.of(context).size.width * 0.08,
                                           // ),
                                           Text(
-                                            "Awating. professional Response... ",
-                                            // resout[widget.index]['Date']
-                                            //     .toString()
-                                            //     .replaceRange(10, 24, ""),
+                                            finalDate,
                                             style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 12,
                                               color: black(context),
@@ -226,10 +252,15 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                                             ),
                                           ),
                                           Text(
-                                            " - ${output['approvedbyprofessional']}",
+                                            " - Waiting for professional confimation ",
+                                            // resout[widget.index]['Date']
+                                            //     .toString()
+                                            //     .replaceRange(10, 24, ""),
                                             style: GoogleFonts.poppins(
-                                                fontSize: _widthScale * 12,
-                                                color: black(context)),
+                                              fontSize: _widthScale * 10,
+                                              color: black(context),
+                                              // fontWeight: FontWeight.w600
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -267,25 +298,11 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                           SizedBox(
                             height: _heightScale * 32,
                           ),
-                          Appointment(
-                              "Date: ",
-                              output['Date']
-                                  .toString()
-                                  .replaceRange(10, 24, ""),
-                              text9),
+                          Appointment("Date: ", finalDate, text9),
                           SizedBox(
                             height: _heightScale * 32,
                           ),
-                          Row(
-                            children: [
-                              // spacehort,
-                              Text(
-                                "Time Slot",
-                                style: GoogleFonts.poppins(
-                                    fontSize: _widthScale * 16, color: text9),
-                              ),
-                            ],
-                          ),
+
                           SizedBox(
                             height: _heightScale * 23,
                           ),
@@ -300,19 +317,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
                           //   ],
                           // ),
                           // spacevert2,
-                          Row(
-                            children: [
-                              // spacehort,
-                              Text(
-                                output['meetingtime'] == null
-                                    ? "Awaiting professional's Response"
-                                    : output['meetingtime'].toString(),
-                                style: GoogleFonts.poppins(
-                                    fontSize: _widthScale * 17,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+
                           // spacevert1,
                           // Container(
                           //   //margin: EdgeInsets.only(left: 35, right: 35),
@@ -333,7 +338,7 @@ class _AspirantBookingUpdateState extends State<AspirantBookingUpdate> {
   Widget Appointment(String heading, String data, Color col) {
     const double kDesignWidth = 375;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
-
+    print("TTTTT" "${data}");
     return Row(
       children: [
         // SizedBox(

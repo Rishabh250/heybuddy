@@ -452,7 +452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 textStyle: TextStyle(
                     color: text2(context),
                     fontSize: _widthScale * 13,
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -514,7 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 textStyle: TextStyle(
                     color: text2(context),
                     fontSize: _widthScale * 13,
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -557,34 +557,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
   }
-
-  // Widget buildImages() {
-  //   const double kDesignWidth = 375;
-  //   const double kDesignHeight = 812;
-  //   double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
-  //   double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
-  //   return Container(
-  //     height: _heightScale * 90,
-  //     width: _widthScale * 90,
-  //     decoration: BoxDecoration(
-  //         image:
-  //             DecorationImage(image: FileImage(imageFile), fit: BoxFit.cover),
-  //         borderRadius: BorderRadius.all(Radius.circular(_widthScale * 60))),
-  //   );
-  // }
-
-  // Widget buildImages2() {
-  //   const double kDesignWidth = 375;
-  //   const double kDesignHeight = 812;
-  //   double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
-  //   double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
-  //   return Container(
-  //     height: _heightScale * 90,
-  //     width: _widthScale * 90,
-  //     decoration: BoxDecoration(
-  //         color: Colors.grey[200],
-  //         //   image: DecorationImage(image: FileImage(imageFile), fit: BoxFit.fill),
-  //         borderRadius: BorderRadius.all(Radius.circular(_widthScale * 60))),
-  //   );
-  // }
 }

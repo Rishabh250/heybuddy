@@ -6,12 +6,12 @@ import 'package:heybuddy/api/signin_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
-mybookings(var token) async {
-  http.Response res = await http.get(
-    // Uri.parse('https://heybuddybackend.herokuapp.com/api/getTransactions'),
-    Uri.parse('https://heybuddybackend.herokuapp.com/api/myBookings2'),
-    headers: {"x-access-token": token},
-  );
+mybookings(var token, year) async {
+  http.Response res = await http.post(
+      // Uri.parse('https://heybuddybackend.herokuapp.com/api/getTransactions'),
+      Uri.parse('https://heybuddybackend.herokuapp.com/api/myBookings2'),
+      headers: {"x-access-token": token},
+      body: {"year": "$year"});
   var share1 = json.decode(res.body);
   if (res.statusCode == 200) {
     print("mypayments$share1");

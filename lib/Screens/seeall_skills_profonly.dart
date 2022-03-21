@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/api/api_profile.dart';
 import 'package:heybuddy/api/deleteskill.dart';
@@ -33,9 +34,11 @@ class _SeeAllSkillsProfOnlyState extends State<SeeAllSkillsProfOnly> {
   onTap() async {
     response = await getdata(tkn);
     // pp = response;
-    setState(() {
-      iii = false;
-    });
+    if (mounted) {
+      setState(() {
+        iii = false;
+      });
+    }
     return response;
     // setState(() {
     //   vv = [...vv, ...response];
@@ -95,6 +98,7 @@ class _SeeAllSkillsProfOnlyState extends State<SeeAllSkillsProfOnly> {
       iii = true;
     });
     delskill = await DeleteSkill.delete(name.toString().toLowerCase(), tkn);
+    EasyLoading.dismiss();
     print("skill name is ${name.toString().toLowerCase()}");
     setState(() {
       onTap();
@@ -126,7 +130,7 @@ class _SeeAllSkillsProfOnlyState extends State<SeeAllSkillsProfOnly> {
         title: Text(
           "Skills",
           style: GoogleFonts.poppins(
-              color:black(context), fontSize: _widthScale * 18),
+              color: black(context), fontSize: _widthScale * 18),
         ),
       ),
       body: SingleChildScrollView(
@@ -257,6 +261,7 @@ class _SeeAllSkillsProfOnlyState extends State<SeeAllSkillsProfOnly> {
                     right: _widthScale * 45.0, top: _heightScale * 5),
                 child: GestureDetector(
                   onTap: () {
+                    EasyLoading.show();
                     del(time);
                   },
                   child: Icon(

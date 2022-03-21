@@ -1,5 +1,9 @@
+// ignore_for_file: unnecessary_statements
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/aspirant_setting.dart';
 import 'package:heybuddy/Screens/mybookings.dart';
@@ -7,6 +11,7 @@ import 'package:heybuddy/Screens/mypayments.dart';
 import 'package:heybuddy/Screens/onboarding_Screen.dart';
 import 'package:heybuddy/Screens/professionaluserprofile.dart';
 import 'package:heybuddy/Screens/profile.dart';
+import 'package:heybuddy/Screens/refferal_screen.dart';
 import 'package:heybuddy/Screens/setting.dart';
 import 'package:heybuddy/Screens/signin_Phone.dart';
 import 'package:heybuddy/Screens/welcome.dart';
@@ -14,6 +19,7 @@ import 'package:heybuddy/api/api_profile.dart';
 import 'package:heybuddy/api/isavailableget.dart';
 import 'package:heybuddy/api/isavailablepost.dart';
 import 'package:heybuddy/api/profileget_api.dart';
+import 'package:heybuddy/api/reffered.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/shared_preference/innercheck_shared_preference.dart';
@@ -23,6 +29,10 @@ import 'package:heybuddy/shared_preference/token_preference.dart';
 import 'package:heybuddy/shared_preference/upercheck_sharedpreference.dart';
 import 'package:heybuddy/widgets/custom_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+
+var title;
+var subtitle;
 
 class CustomAppDrawer extends StatefulWidget {
   const CustomAppDrawer({Key? key}) : super(key: key);
@@ -113,17 +123,17 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
     return nameval;
   }
 
-  tttoggle(var x) {
-    if (x == "true") {
-      // setState(() {
-      isSwitch1 = true;
-      // });
-    } else if (x == "false") {
-      // setState(() {
-      isSwitch1 = false;
-      // });
-    }
-  }
+  // tttoggle(var x) {
+  //   if (x == "true") {
+  //     // setState(() {
+  //     isSwitch1 = true;
+  //     // });
+  //   } else if (x == "false") {
+  //     // setState(() {
+  //     isSwitch1 = false;
+  //     // });
+  //   }
+  // }
 
   bool isSwitch1 = false;
   // var tkn = datam.read('f');
@@ -149,20 +159,28 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
     anon = await checkavailable(tkn);
     print("vvvvvvv$anon");
     if (anon == "true") {
-      setState(() {
-        isSwitch1 = true;
-      });
+      if (mounted)
+        setState(() {
+          isSwitch1 = true;
+          EasyLoading.dismiss();
+        });
     } else if (anon == "false") {
-      setState(() {
-        isSwitch1 = false;
-      });
+      if (mounted) {
+        setState(() {
+          isSwitch1 = false;
+        });
+      }
+      EasyLoading.dismiss();
     }
     // isSwitch1 = anon;
     print("dpppppp$isSwitch1");
     print("anon is $anon");
     print("$anon");
+
     return anon;
   }
+
+  void setStateIfMounted() {}
 
   // var tkn = datam.read('f');
   Future getData() async {
@@ -209,17 +227,32 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                             fontWeight: FontWeight.bold),
                       ),
                     ),
+                    Spacer(),
+                    GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: Icon(Icons.close)),
                   ],
                 ),
                 SizedBox(
                   height: _heightScale * 10,
                 ),
-                Text(
-                  "This will not let anyone book session with you. Do you wish you stay Not Available ? ",
-                  style: GoogleFonts.poppins(
-                    textStyle: TextStyle(fontSize: 14, color: black(context)),
-                  ),
-                ),
+                (nameval['anonymous'] == 'false')
+                    ? Text(
+                        "Turning into 'Not Available' makes you not available for bookings.",
+                        style: GoogleFonts.poppins(
+                          textStyle:
+                              TextStyle(fontSize: 14, color: black(context)),
+                        ),
+                      )
+                    : Text(
+                        "Enabling anonymous will make your name and profile picture hidden ",
+                        style: GoogleFonts.poppins(
+                          textStyle:
+                              TextStyle(fontSize: 14, color: black(context)),
+                        ),
+                      ),
               ],
             ),
           );
@@ -277,18 +310,10 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                         inCheck == false
                             ? Row(
                                 children: [
+                                  Spacer(),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.27,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showAlertDialogss(context);
-                                    },
-                                    child: Icon(
-                                      Icons.info_outline_rounded,
-                                      color: whites,
-                                    ),
                                   ),
                                   SizedBox(
                                     width: _widthScale * 5,
@@ -305,33 +330,37 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                                     onChanged: (value) async {
                                       // output = await Anonynmous.choice(tkn);
                                       // intoggle();
-                                      print("switch is $isSwitch1");
 
-                                      setState(() {
-                                        // isSwitch = value;
-                                        // isSwitch1 = value;
-                                        // if (value == true) {
-                                        //   setState(() {
-                                        //     anon = "true";
-                                        //   });
-                                        //   print(";jjj$anon");
-                                        // } else if (value == false) {
-                                        //   setState(() {
-                                        //     anon = "false";
-                                        //   });
-                                        //   print(";jjggg$anon");
-                                        // }
-                                        // print("isSwitch1$isSwitch1");
-                                        // print(
-                                        //     "isSwitchhhhhhhhhhisSwitch$isSwitch");
-                                      });
+                                      // setState(() {
+                                      //   // isSwitch = value;
+                                      //   // isSwitch1 = value;
+                                      //   // if (value == true) {
+                                      //   //   setState(() {
+                                      //   //     anon = "true";
+                                      //   //   });
+                                      //   //   print(";jjj$anon");
+                                      //   // } else if (value == false) {
+                                      //   //   setState(() {
+                                      //   //     anon = "false";
+                                      //   //   });
+                                      //   //   print(";jjggg$anon");
+                                      //   // }
+                                      //   // print("isSwitch1$isSwitch1");
+                                      //   // print(
+                                      //   //     "isSwitchhhhhhhhhhisSwitch$isSwitch");
+                                      // });
 
                                       print("switch after $isSwitch1");
                                       if (value == true) {
                                         print("lllll$isSwitch1");
                                         intoggle("true");
+                                        print("switch is $isSwitch1");
+                                        showAlertDialogss(context);
+
                                         getdataanonmymous();
                                       } else if (value == false) {
+                                        EasyLoading.show();
+
                                         intoggle("false");
                                         getdataanonmymous();
                                       }
@@ -370,32 +399,6 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                             spacehort,
                             GestureDetector(
                               onTap: () {
-                                // upCheck == true
-                                //     ? (val == false
-                                //         ? Navigator.push(
-                                //             context,
-                                //             MaterialPageRoute(
-                                //                 builder: (context) =>
-                                //                     ProfessionalUserProfile()))
-                                //         : Navigator.push(
-                                //             context,
-                                //             MaterialPageRoute(
-                                //                 builder: (context) =>
-                                //                     ProfileScreen())))
-                                //     : inCheck == true
-                                //         //  : (inCheck == true||inCheckk == false)
-                                //         ? Navigator.push(
-                                //             context,
-                                //             MaterialPageRoute(
-                                //                 builder: (context) =>
-                                //                     ProfileScreen()))
-                                //         : inCheck == null
-                                //             ? CircularProgressIndicator()
-                                //             : Navigator.push(
-                                //                 context,
-                                //                 MaterialPageRoute(
-                                //                     builder: (context) =>
-                                //                         ProfessionalUserProfile()));
                                 inCheck == false
                                     ? Navigator.push(
                                         context,
@@ -432,17 +435,19 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                                 inCheck == false
                                     ? InkWell(
                                         onTap: () {
-                                          // word == "I am a professional"
-                                          //     ? Navigator.push(
-                                          //         context,
-                                          //         MaterialPageRoute(
-                                          //             builder: (context) => MyPayments()))
-                                          //     : null;
+                                          var joinDate = nameval['joiningDate']
+                                              .toString()
+                                              .replaceRange(10, 24, "");
+                                          var joinDateList =
+                                              joinDate.split("-");
+                                          int date = int.parse(joinDateList[0]);
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      MyPayments()));
+                                                      MyPayments(
+                                                        joinDate: date,
+                                                      )));
                                         },
                                         child: topics1("assets/paymentsimg.png",
                                             "My Earnings", text666(context)),
@@ -453,11 +458,18 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                                   onTap: () {
                                     // word == "I am a professional"
                                     //     ?
+                                    var joinDate = nameval['joiningDate']
+                                        .toString()
+                                        .replaceRange(10, 24, "");
+                                    var joinDateList = joinDate.split("-");
+                                    int date = int.parse(joinDateList[0]);
+
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                MyBookings()));
+                                            builder: (context) => MyBookings(
+                                                  joinDate: date,
+                                                )));
                                     // : null;
                                   },
                                   child: topics1("assets/paymentsimg.png",
@@ -503,8 +515,22 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
                                 topics1("assets/Group 1136.png",
                                     "Help & Support", text666(context)),
                                 SizedBox(height: _heightScale * 8),
-                                topics1("assets/paymentsimg.png",
-                                    "Refer a Friend", text666(context)),
+                                GestureDetector(
+                                  onTap: () {
+                                    var code = nameval['referCodeGiven'];
+                                    var name = nameval['name'];
+                                    Get.to(() => ReferPage(), arguments: [
+                                      {"code": code},
+                                      {"name": name},
+                                      {"token": tkn}
+                                    ]);
+                                    // print(title);
+                                  },
+                                  child: topics1(
+                                      "assets/refer.png",
+                                      "Share with your friends",
+                                      text666(context)),
+                                ),
                               ],
                             ),
                           ),
@@ -562,7 +588,7 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
               Text(
                 title,
                 style: GoogleFonts.poppins(
-                    fontSize: _widthScale * 18,
+                    fontSize: _widthScale * 16,
                     color: col,
                     fontWeight: FontWeight.w500),
               ),
@@ -573,7 +599,7 @@ class _CustomAppDrawerState extends State<CustomAppDrawer> {
     );
   }
 
-  Widget topics(String img, String title, String subtitle) {
+  Widget topics(String img, title, subtitle) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;

@@ -41,7 +41,8 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
   //   getSearch(page, "${_name.text} ${_company.text} ${_designation.text}");
   //   // getSearch(page, _controller.text);
   // }
-
+  var addNew = true;
+  int score = 5;
   @override
   void initState() {
     super.initState();
@@ -49,26 +50,17 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
   }
 
   getSearch(page, name) async {
-    res = await getSearchUserss(page, name);
+    if (score == 5 && addNew) {
+      res = await getUser(page, name);
+      filteredUsers();
+      addNew = false;
+    }
+  }
+
+  filteredUsers() {
     setState(() {
       filterUsers = res;
     });
-    // setState(() {
-    //   //   data = response;
-    //   if (page > 1) {
-    //     print("me chla");
-    //     data.addAll(res);
-    //     filterUsers = [
-    //       ...filterUsers,
-    //       ...res,
-    //     ];
-    //     refreshController.loadComplete();
-    //   } else {
-    //     print("Done");
-    //     filterUsers = res;
-    //   }
-    //   EasyLoading.dismiss();
-    // });
   }
 
   String getCapitalizeString(String input) {
@@ -78,6 +70,7 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
           '${splitStr[i][0].toUpperCase()}${splitStr[i].substring(1)}';
     }
     final output = splitStr.join(' ');
+    print("RRRTTCC" + output.toString());
     return output;
   }
 
@@ -252,7 +245,7 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
                   ),
                   Row(
                     children: [
-                      Text("Designation",
+                      Text("Skills",
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -310,33 +303,36 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
                   SizedBox(
                     height: _heightScale * 10,
                   ),
-                  filterUsers.isEmpty
-                      ? ElevatedButton(
-                          onPressed: () {
-                            print(
-                                "ssssssssss${_name.text}${_company.text}${_designation.text}");
-                            // setState(() {
-                            getSearch(page,
-                                "${_name.text}${_company.text}${_designation.text}");
-                            // });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: text6,
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0),
-                              side: BorderSide(color: white(context)),
-                            ),
-                          ),
-                          child: Text(
-                            "Search",
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                  fontSize: 16, color: white(context)),
-                            ),
-                          ))
-                      : SizedBox(
-                          height: 0,
+                  ElevatedButton(
+                      onPressed: () {
+                        if (addNew == false) {
+                          addNew = true;
+                        }
+                        print("sharesssss${_name.text}" +
+                            " ${_company.text}" +
+                            " ${_designation.text}");
+                        // setState(() {
+                        getSearch(
+                            page,
+                            "${_name.text}" +
+                                " ${_company.text}" +
+                                " ${_designation.text}");
+                        // });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: text6,
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0),
+                          side: BorderSide(color: white(context)),
                         ),
+                      ),
+                      child: Text(
+                        "Search",
+                        style: GoogleFonts.poppins(
+                          textStyle:
+                              TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ))
                 ],
               ),
               SizedBox(
@@ -361,58 +357,35 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
                           future: getSearch(page,
                               "${_name.text}${_company.text}${_designation.text}"),
                           builder: (context, snapShot) {
-                            return
-                                // SmartRefresher(
-                                //   controller: refreshController,
-                                //   enablePullUp: true,
-                                //   enablePullDown: false,
-                                //   onRefresh: _onRefresh,
-                                //   onLoading: () => _onLoading(context),
-                                //   child:
-                                ListView.builder(
-                                    itemCount:
-                                        res != null ? filterUsers.length : 0,
-                                    itemBuilder: (BuildContext context, index) {
-                                      List ggg = [];
-                                      ggg = filterUsers[index]['company'];
-                                      return box2(
-                                        // "assets/Ellipse 9.png",
-                                        // res != null
-                                        //     ? filterUsers[index]
-                                        //                 ['profilePic'] !=
-                                        //             ""
-                                        //         ? filterUsers[index]
-                                        //             ['profilePic']
-                                        //         : imggg
-                                        //     :
-                                        "",
-                                        // "Manideep Mittapelli",
-                                        res != null
-                                            ? filterUsers[index]['name']
-                                            : "",
-                                        // "Sr Technical Program Manager",
-                                        ggg.isEmpty
-                                            ? "Not Mentioned"
-                                            : filterUsers[index]['company'][0]
-                                                ['title'],
-                                        // "a",
-                                        "assets/Education.png",
-                                        // res != null
-                                        //     ? filterUsers[index]['university'] !=
-                                        //             null
-                                        //         ? filterUsers[index]['university']
-                                        //         : "Not Added by Professional Yet"
-                                        //     :
-                                        "",
-                                        ggg.isEmpty
-                                            ? "Not Mentioned"
-                                            : filterUsers[index]['company'][0]
-                                                ['company_name'],
-                                        // "b",
-                                        // "assets/Rectangle 704.png",
-                                        index,
-                                      );
-                                    });
+                            return ListView.builder(
+                                itemCount: res != null ? filterUsers.length : 0,
+                                itemBuilder: (BuildContext context, index) {
+                                  List ggg = [];
+                                  ggg = filterUsers[index]['company'];
+                                  return box2(
+                                    "",
+                                    // "Manideep Mittapelli",
+                                    res != null
+                                        ? filterUsers[index]['name']
+                                        : "",
+                                    // "Sr Technical Program Manager",
+                                    ggg.isEmpty
+                                        ? "Not Mentioned"
+                                        : filterUsers[index]['company'][0]
+                                            ['title'],
+                                    // "a",
+                                    "assets/Education.png",
+
+                                    "",
+                                    ggg.isEmpty
+                                        ? "Not Mentioned"
+                                        : filterUsers[index]['company'][0]
+                                            ['company_name'],
+                                    // "b",
+                                    // "assets/Rectangle 704.png",
+                                    index,
+                                  );
+                                });
                             // );
                           }),
                     ),
@@ -616,7 +589,7 @@ class _DetailSearchPageState extends State<DetailSearchPage> {
                     //   height: _heightScale * 30,
                     //   width: _widthScale * 107,
                     // ),
-                    Text(getCapitalizeStringaa(img3),
+                    Text(img3.toUpperCase(),
                         style: GoogleFonts.poppins(
                           fontSize: _widthScale * 12,
                         )),

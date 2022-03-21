@@ -29,6 +29,21 @@ class _PoolSessionState extends State<PoolSession> {
     getData();
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
   var tkn = datam.read('f');
   var response;
   getData() async {
@@ -52,7 +67,6 @@ class _PoolSessionState extends State<PoolSession> {
   getAllEvents() async {
     events = await getallevents();
     event = events;
-    print('ffddss eventid is ${event[1]['_id']}');
     return event;
   }
 
@@ -190,6 +204,76 @@ class _PoolSessionState extends State<PoolSession> {
           child: FutureBuilder(
               future: getAllEvents(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                var time = event[widget.index]["meetingTime"];
+                time = time.split(':');
+                var hours = int.parse(time[0]);
+                if (hours > 12) {
+                  if (hours == 13) {
+                    hours = 1;
+                  }
+                  if (hours == 14) {
+                    hours = 2;
+                  }
+                  if (hours == 15) {
+                    hours = 3;
+                  }
+                  if (hours == 16) {
+                    hours = 4;
+                  }
+                  if (hours == 17) {
+                    hours = 5;
+                  }
+                  if (hours == 18) {
+                    hours = 6;
+                  }
+                  if (hours == 19) {
+                    hours = 7;
+                  }
+                  if (hours == 20) {
+                    hours = 8;
+                  }
+                  if (hours == 21) {
+                    hours = 9;
+                  }
+                  if (hours == 22) {
+                    hours = 10;
+                  }
+                  if (hours == 23) {
+                    hours = 11;
+                  }
+                  if (hours == 24) {
+                    hours = 0;
+                  }
+                }
+                var noon;
+                if (int.parse(time[0]) > 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) == 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) < 12) {
+                  noon = "AM";
+                }
+
+                var finalTime = hours.toString() + ":" + time[1] + " " + noon;
+
+                var date = event[widget.index]["Date"];
+                date = date.split('/');
+
+                var mon = int.parse(date[1]);
+
+                var finalDate =
+                    date[2] + " " + months[mon - 1] + ', ' + date[0];
+
                 return events == null
                     ? Container(
                         height: _heightScale * 700,
@@ -253,20 +337,129 @@ class _PoolSessionState extends State<PoolSession> {
                               ],
                             ),
                           ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: _widthScale * 24.0,
+                                top: _heightScale * 20),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    event[widget.index]['profs'].length == 1
+                                        ? Text(getCapitalizeStringaa(
+                                            "Professional Name : " +
+                                                event[widget.index]['profs'][0]
+                                                        ['name']
+                                                    .toString()
+                                                    .toUpperCase()))
+                                        : event[widget.index]['profs'].length ==
+                                                2
+                                            ? Text(
+                                                getCapitalizeStringaa(
+                                                    "Professional Name : " +
+                                                        event[widget.index]
+                                                                    ['profs'][0]
+                                                                ['name']
+                                                            .toString()
+                                                            .toUpperCase() +
+                                                        " and  " +
+                                                        event[widget.index]
+                                                                    ['profs'][1]
+                                                                ['name']
+                                                            .toString()
+                                                            .toUpperCase()),
+                                                style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize:
+                                                            _widthScale * 16,
+                                                        color: black(context))),
+                                              )
+                                            : event[widget.index]['profs']
+                                                        .length ==
+                                                    2
+                                                ? Text(
+                                                    getCapitalizeStringaa(
+                                                        "Professional Name : " +
+                                                            event[widget.index][
+                                                                        'profs']
+                                                                    [0]['name']
+                                                                .toString()
+                                                                .toUpperCase() +
+                                                            ", " +
+                                                            event[widget.index][
+                                                                        'profs']
+                                                                    [1]['name']
+                                                                .toString()
+                                                                .toUpperCase() +
+                                                            ", " +
+                                                            event[widget.index][
+                                                                        'profs']
+                                                                    [2]['name']
+                                                                .toString()
+                                                                .toUpperCase()),
+                                                    style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize:
+                                                                _widthScale *
+                                                                    16,
+                                                            color: black(
+                                                                context))),
+                                                  )
+                                                : Text("Anonymous",
+                                                    style: GoogleFonts.poppins(
+                                                        textStyle: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize:
+                                                                _widthScale *
+                                                                    16,
+                                                            color:
+                                                                black(context))))
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
                           SizedBox(
                             height: _heightScale * 20,
                           ),
                           content(
                               "assets/cal.png",
-                              "${event[widget.index]["Date"]} ,"
-                                  " ${event[widget.index]["meetingTime"]}"),
+                              "$finalDate , "
+                                  "$finalTime"),
                           SizedBox(
                             height: _heightScale * 8,
                           ),
                           content("assets/video.png", "Online"),
                           SizedBox(
+                            height: _heightScale * 8,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: _widthScale * 24.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  getCapitalizeStringaa("Duration : "
+                                      "${event[widget.index]['duration']}"),
+                                  style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                          fontSize: _widthScale * 12,
+                                          color: black(context))),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
                             height: _heightScale * 20,
                           ),
+
                           Padding(
                             padding: EdgeInsets.only(
                                 left: _widthScale * 24.0,

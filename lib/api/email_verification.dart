@@ -12,12 +12,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 final datam = GetStorage();
 
 class EmailVerification {
-  static Future verification(var email) async {
+  static Future verification(var email, var name) async {
     print('SignUp');
     var dio = Dio();
 
     FormData formData = FormData.fromMap({
       'email': email,
+      'name': name,
     });
 
     var response = await dio.post(

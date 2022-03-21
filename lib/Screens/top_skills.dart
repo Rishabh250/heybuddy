@@ -66,7 +66,7 @@ class _TopSkillsState extends State<TopSkills> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: _heightScale * 40,
+              height: _heightScale * 10,
             ),
             Row(
               children: [
@@ -83,7 +83,9 @@ class _TopSkillsState extends State<TopSkills> {
                   width: _widthScale * 10,
                 ),
                 Text("Top Skills",
-                    style: GoogleFonts.poppins(fontSize: _widthScale * 18)),
+                    style: GoogleFonts.poppins(
+                        fontSize: _widthScale * 18,
+                        fontWeight: FontWeight.bold)),
               ],
             ),
 
@@ -132,49 +134,45 @@ class _TopSkillsState extends State<TopSkills> {
               isLoading = false;
             });
           },
-          child: Container(
-            padding: EdgeInsets.only(
-                top: _heightScale * 10, bottom: _heightScale * 15),
-            decoration: BoxDecoration(
-                color: title == ti
-                    ? isLoading == true
-                        ? text6.withOpacity(0.1)
-                        : white(context).withOpacity(0.39)
-                    : white(context).withOpacity(0.39),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                border: Border.all(
-                    color:
-                        // isLoading == true ? white.withOpacity(0.39) :
-                        text6)),
-            child: ListTile(
-              title: Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.poppins(fontSize: _widthScale * 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: _widthScale * 9,
-                  ),
-                ],
-              ),
-              subtitle: Row(
-                children: [
-                  Icon(
-                    Icons.people,
-                    color: blue(context),
-                    size: _widthScale * 18,
-                  ),
-                  SizedBox(
-                    width: _widthScale * 7.93,
-                  ),
-                  Text("Click to see no. of users",
-                      style: GoogleFonts.poppins(fontSize: 12, color:Styles.isDark ? whites.withOpacity(0.8) :  text10))
-                ],
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: title == ti
+                      ? isLoading == true
+                          ? text6.withOpacity(0.1)
+                          : white(context).withOpacity(0.39)
+                      : white(context).withOpacity(0.39),
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  border: Border.all(
+                      color:
+                          // isLoading == true ? white.withOpacity(0.39) :
+                          text6)),
+              child: ListTile(
+                title: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Image.asset(
+                          "assets/Skill Set.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          title,
+                          style:
+                              GoogleFonts.poppins(fontSize: _widthScale * 16),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: _widthScale * 9,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

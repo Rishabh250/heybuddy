@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:heybuddy/Screens/company.dart';
 import 'package:heybuddy/api/api_profile.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/api/update_profile_api.dart';
@@ -7,6 +9,8 @@ import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/provider/styles.dart';
 import 'package:heybuddy/widgets/user_model.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
+
+import '../api/suggestions_api/skills.dart';
 
 class NewSkills extends StatefulWidget {
   const NewSkills({Key? key}) : super(key: key);
@@ -16,8 +20,16 @@ class NewSkills extends StatefulWidget {
 }
 
 class _NewSkillsState extends State<NewSkills> {
+  List collage = ["Search your skills"];
+  var pickedDate;
+  var newDate;
+  bool checkSchool = false;
+  bool isVisible = false;
+  bool isVisiblebtn = true;
   TextEditingController _cont = TextEditingController();
   GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  GetSkillApi getSkillsApi = GetSkillApi();
+
   late UserModel userModel = new UserModel(
     "",
     // 18,
@@ -78,6 +90,8 @@ class _NewSkillsState extends State<NewSkills> {
     // Navigator.pop(context);
     // Navigator.pushReplacement(
     //   context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+    EasyLoading.dismiss();
+
     Navigator.pop(context);
   }
 
@@ -147,7 +161,6 @@ class _NewSkillsState extends State<NewSkills> {
                           height: _heightScale * 15,
                         ),
                         _uiWidget(),
-
                         SizedBox(height: _heightScale * 15),
                         Row(
                           children: [
@@ -200,15 +213,6 @@ class _NewSkillsState extends State<NewSkills> {
                                                 index));
                                       });
                             }),
-                        // ListView.builder(
-                        //     shrinkWrap: true,
-                        //     physics: NeverScrollableScrollPhysics(),
-                        //     itemCount: x != null ? x : 0,
-                        //     itemBuilder: (context, index) {
-                        //       return button( getCapitalizeStringaa(
-                        //                                           response["skills"]
-                        //                                               [index]), text6, white, index);
-                        //     }),
                       ],
                     );
             });
@@ -263,24 +267,6 @@ class _NewSkillsState extends State<NewSkills> {
               ),
             ),
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: [
-          //     Padding(
-          //       padding: EdgeInsets.only(
-          //           right: _widthScale * 25.0, top: _heightScale * 5),
-          //       child: GestureDetector(
-          //         onTap: () {
-          //           // del(time);
-          //         },
-          //         child: Icon(
-          //           Icons.cancel,
-          //           color: Colors.red,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
         ]),
         SizedBox(
           height: _heightScale * 15,
@@ -355,46 +341,6 @@ class _NewSkillsState extends State<NewSkills> {
                     ),
                   ),
                 ),
-                // TextFormField(
-                //   initialValue: "General Conversation",
-
-                //   validator: (onValidateVal) {
-                //     if (onValidateVal!.isEmpty) {
-                //       return 'User Name can\'t be empty.';
-                //     }
-
-                //     return null;
-                //   },
-                //   onSaved: (onSavedVal) => {
-                //     this.userModel.generalConversation = onSavedVal!,
-                //   },
-                //   // onEditingComplete: validateAndSave,
-                //   autofocus: false,
-                //   style: TextStyle(
-                //       fontSize: _widthScale * 15.0,
-                //       color: black(context).withOpacity(0.6)),
-                //   decoration: InputDecoration(
-                //     filled: true,
-                //     fillColor: white.withOpacity(0.5),
-                //     hintText: "General Conversation",
-                //     hintStyle: GoogleFonts.poppins(
-                //         textStyle: TextStyle(
-                //             fontSize: _widthScale * 16,
-                //             color: text12.withOpacity(0.8))),
-                //     contentPadding: EdgeInsets.only(
-                //         left: _widthScale * 14.0,
-                //         bottom: _heightScale * 8.0,
-                //         top: _heightScale * 8.0),
-                //     focusedBorder: OutlineInputBorder(
-                //       borderSide: BorderSide(color: col1),
-                //       borderRadius: BorderRadius.circular(_widthScale * 6),
-                //     ),
-                //     enabledBorder: UnderlineInputBorder(
-                //       borderSide: BorderSide(color: textFieldColor(context),
-                //       borderRadius: BorderRadius.circular(_widthScale * 6),
-                //     ),
-                //   ),
-                // ),
               ),
               SizedBox(
                 height: _heightScale * 15,
@@ -419,9 +365,11 @@ class _NewSkillsState extends State<NewSkills> {
                 height: _heightScale * 15,
               ),
               emailsContainerUI(),
+
               SizedBox(
                 height: _heightScale * 25,
               ),
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: _widthScale * 24),
                 child: Container(
@@ -430,6 +378,7 @@ class _NewSkillsState extends State<NewSkills> {
                   child: ElevatedButton(
                       onPressed: () async {
                         if (validateAndSave()) {
+                          EasyLoading.show();
                           print("ggg${this.userModel.toJson()}");
                           print("ggg${this.userModel.generalConversation}");
                           print(
@@ -498,6 +447,8 @@ class _NewSkillsState extends State<NewSkills> {
   }
 
   Widget emailUI(index) {
+    var search;
+
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
@@ -508,72 +459,226 @@ class _NewSkillsState extends State<NewSkills> {
         children: [
           Flexible(
             flex: 1,
-            child: TextFormField(
-              // controller: _cont,
-              validator: (onValidateVal) {
-                if (onValidateVal!.isEmpty) {
-                  return 'Skills ${index + 1} can\'t be empty.';
-                }
+            child: Visibility(
+              visible: true,
+              child: Container(
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                child: MaterialButton(
+                    color: white(context).withOpacity(1),
+                    onPressed: () {
+                      showModalBottomSheet(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          context: context,
+                          builder: (builder) {
+                            return Container(
+                              height: 800,
+                              width: MediaQuery.of(context).size.width,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height: 50,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.8,
+                                              height: 100,
+                                              child: TextFormField(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    search = value;
+                                                  });
+                                                  getSkillsApi
+                                                      .getUniList(search);
 
-                return null;
-              },
-              onSaved: (onSavedVal) => {
-                this.userModel.skills[index] = onSavedVal!,
-              },
-              autofocus: false,
-              style: TextStyle(
-                  fontSize: _widthScale * 15.0, color: black(context)),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: white(context).withOpacity(0.5),
-                hintText: "Enter Your Skills",
-                hintStyle: GoogleFonts.poppins(
-                    textStyle: TextStyle(
-                        fontSize: _widthScale * 16,
-                        color: text12.withOpacity(0.8))),
-                contentPadding: EdgeInsets.only(
-                    left: _widthScale * 14.0,
-                    bottom: _heightScale * 8.0,
-                    top: _heightScale * 8.0),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: col1),
-                  borderRadius: BorderRadius.circular(_widthScale * 6),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: textFieldColor(context),
-                  ),
-                  borderRadius: BorderRadius.circular(_widthScale * 6),
-                ),
+                                                  print(search);
+                                                },
+                                                // controller: _cont,
+
+                                                autofocus: false,
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        _widthScale * 15.0,
+                                                    color: black(context)),
+                                                decoration: InputDecoration(
+                                                  filled: true,
+                                                  fillColor: white(context)
+                                                      .withOpacity(0.5),
+                                                  hintText: "Enter Your Skills",
+                                                  hintStyle:
+                                                      GoogleFonts.poppins(
+                                                          textStyle: TextStyle(
+                                                              fontSize:
+                                                                  _widthScale *
+                                                                      16,
+                                                              color: text12
+                                                                  .withOpacity(
+                                                                      0.8))),
+                                                  contentPadding:
+                                                      EdgeInsets.only(
+                                                          left: _widthScale *
+                                                              14.0,
+                                                          bottom: _heightScale *
+                                                              8.0,
+                                                          top: _heightScale *
+                                                              8.0),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide:
+                                                        BorderSide(color: col1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            _widthScale * 6),
+                                                  ),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: textFieldColor(
+                                                          context),
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            _widthScale * 6),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 35,
+                                              child: IconButton(
+                                                icon: Icon(
+                                                  Icons.add_circle,
+                                                  color: Colors.green,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  setState(() {
+                                                    collage[index] =
+                                                        search.toString();
+                                                    this
+                                                            .userModel
+                                                            .skills[index] =
+                                                        search.toString();
+                                                  });
+                                                },
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 400,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: FutureBuilder(
+                                          future:
+                                              getSkillsApi.getUniList(search),
+                                          builder: (context,
+                                              AsyncSnapshot snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            }
+                                            if (snapshot.hasData) {
+                                              var data = snapshot.data;
+                                              if (data.suggestions.length ==
+                                                  0) {
+                                                return Center(
+                                                  child: search
+                                                              .toString()
+                                                              .isEmpty ||
+                                                          search == null
+                                                      ? Text(
+                                                          "Serach your skills")
+                                                      : Text("Not Found"),
+                                                );
+                                              }
+                                            }
+
+                                            if (snapshot.hasData) {
+                                              var data = snapshot.data;
+                                              return ListView.builder(
+                                                  shrinkWrap: true,
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  itemCount:
+                                                      data.suggestions.length,
+                                                  itemBuilder:
+                                                      (context, snapshot) {
+                                                    return GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          setState(() {
+                                                            collage[index] =
+                                                                data.suggestions[
+                                                                    snapshot];
+                                                            this
+                                                                    .userModel
+                                                                    .skills[
+                                                                index] = data
+                                                                    .suggestions[
+                                                                snapshot];
+                                                          });
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  bottom: 20.0,
+                                                                  left: 10,
+                                                                  right: 10),
+                                                          child: Text(
+                                                              data.suggestions[
+                                                                  snapshot]),
+                                                        ));
+                                                  });
+                                            }
+
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 50.0),
+                                              child: const Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    },
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: Text(
+                          collage[index],
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    )),
               ),
             ),
-            //  FormHelper.inputFieldWidget(
-            //   context,
-            //   Icon(Icons.web),
-            //   "email_$index",
-            //   "",
-            //   (onValidateVal) {
-            //     if (onValidateVal.isEmpty) {
-            //       return 'Email ${index + 1} can\'t be empty.';
-            //     }
-
-            //     return null;
-            //   },
-            //   (onSavedVal) => {
-            //     this.userModel.emails[index] = onSavedVal,
-            //   },
-            //   initialValue: this.userModel.emails[index],
-            //   obscureText: false,
-            //   borderFocusColor: Theme.of(context).primaryColor,
-            //   prefixIconColor: Theme.of(context).primaryColor,
-            //   borderColor: Theme.of(context).primaryColor,
-            //   borderRadius: 2,
-            //   paddingLeft: 0,
-            //   paddingRight: 0,
-            //   showPrefixIcon: false,
-            //   fontSize: 13,
-            //   onChange: (val) {},
-            // ),
           ),
           Visibility(
             child: SizedBox(
@@ -613,6 +718,7 @@ class _NewSkillsState extends State<NewSkills> {
   void addEmailControl() {
     setState(() {
       this.userModel.skills.add("");
+      collage.add("Search your skills");
     });
   }
 
@@ -620,6 +726,7 @@ class _NewSkillsState extends State<NewSkills> {
     setState(() {
       if (this.userModel.skills.length > 1) {
         this.userModel.skills.removeAt(index);
+        collage.removeAt(index);
       }
     });
   }

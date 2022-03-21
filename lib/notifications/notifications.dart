@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -16,7 +15,7 @@ final IOSInitializationSettings initializationSettingsIOS =
         requestBadgePermission: false,
         requestAlertPermission: false,
         onDidReceiveLocalNotification: (i, j, k, l) async {
-          return await true;
+          return true;
         });
 
 const AndroidNotificationDetails firstNotificationAndroidSpecifics =

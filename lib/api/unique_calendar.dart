@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class UniqueUserCalendar {
-  static Future uniqueUser(var orderId,var tokeen) async {
+  static Future uniqueUser(var orderId, var tokeen) async {
     print('SignUp');
     var dio = Dio();
 
@@ -17,7 +17,7 @@ class UniqueUserCalendar {
         validateStatus: (status) {
           return status! < 500;
         },
-         headers: {"x-access-token": tokeen},
+        headers: {"x-access-token": tokeen},
       ),
     );
 

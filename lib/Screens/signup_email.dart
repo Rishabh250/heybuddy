@@ -78,7 +78,7 @@ class _SignUpEmailState extends State<SignUpEmail> {
   //   // x = apihitting;
   //   return apihitting;
   // }
-
+  String newrefCode = "";
   _onsubmit(BuildContext context) async {
     // var check;
     // check = await loginPreference?.getLoginStatus();
@@ -210,7 +210,7 @@ class _SignUpEmailState extends State<SignUpEmail> {
       print("fhghd$check");
       checkStatus(check);
       var emailc;
-      emailc = await EmailVerification.verification(_email.text);
+      emailc = await EmailVerification.verification(_email.text, _name.text);
       print("token is ${emailc['token']}");
       print("status is${emailc['status']} ");
       if (emailc['status'] == false) {
@@ -224,17 +224,22 @@ class _SignUpEmailState extends State<SignUpEmail> {
           isLoading1 = false;
         });
       } else if (emailc['status'] == true) {
+        if (refCode.text.isNotEmpty) {
+          newrefCode = refCode.text.toString();
+        }
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => EmailVerifiy(
-                    who: check == true ? 'aspirant' : 'professional',
-                    email: _email.text,
-                    name: _name.text,
-                    gender: _value,
-                    password: _password.text,
-                    phone: widget.phone,
-                    tkn: emailc['token'])));
+                      who: check == true ? 'aspirant' : 'professional',
+                      email: _email.text,
+                      name: _name.text,
+                      gender: _value,
+                      password: _password.text,
+                      phone: widget.phone,
+                      tkn: emailc['token'],
+                      refCode: newrefCode,
+                    )));
 
         setState(() {
           isLoading1 = false;
@@ -375,6 +380,8 @@ class _SignUpEmailState extends State<SignUpEmail> {
                 _name,
               ),
               fields("xyz@gmail.com", "Enter your email id", _email),
+              fields4("Enter Referral Code", "Referral Code", refCode),
+
               // fieldsy("Gender", "Select Your Gender", _gender),
               Column(
                 children: [
@@ -472,6 +479,9 @@ class _SignUpEmailState extends State<SignUpEmail> {
                             ),
                           )),
               ),
+              SizedBox(
+                height: _heightScale * 35,
+              ),
             ],
           ),
         ),
@@ -542,6 +552,70 @@ class _SignUpEmailState extends State<SignUpEmail> {
   }
 
   Widget fields(String title, String info, var cont) {
+    const double kDesignWidth = 375;
+    const double kDesignHeight = 812;
+    double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
+    double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: _heightScale * 40,
+        ),
+        TextField(
+          controller: cont,
+          autofocus: false,
+          style: TextStyle(fontSize: _widthScale * 15.0, color: black(context)),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: textFieldColor(context),
+            hintText: title,
+            hintStyle: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: _widthScale * 16,
+                    color: text12.withOpacity(0.5))),
+            contentPadding: EdgeInsets.only(
+                left: _widthScale * 14.0,
+                bottom: _heightScale * 8.0,
+                top: _heightScale * 8.0),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: col1),
+              borderRadius: BorderRadius.circular(_widthScale * 6),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: textFieldColor(context),
+              ),
+              borderRadius: BorderRadius.circular(_widthScale * 6),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: _heightScale * 4,
+        ),
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: _widthScale * 16.0),
+              child: Text(
+                info,
+                style: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                      color: text2(context),
+                      fontSize: _widthScale * 13,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  TextEditingController refCode = TextEditingController();
+
+  Widget fields4(String title, String info, var cont) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;

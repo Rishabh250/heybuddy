@@ -29,6 +29,21 @@ class _CancelAppointmentState extends State<CancelAppointment> {
     getDataProfile();
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  bool isLoading = false;
   var tkn = datam.read('f');
   var responseid;
   getDataProfile() async {
@@ -111,7 +126,7 @@ class _CancelAppointmentState extends State<CancelAppointment> {
       height: size.height * 0.03,
     );
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: white(context).withOpacity(0.6),
         elevation: 0,
@@ -125,7 +140,7 @@ class _CancelAppointmentState extends State<CancelAppointment> {
           ),
         ),
         title: Text(
-          "Appointment",
+          "Session Details",
           style: GoogleFonts.poppins(
               color: whitebox(context),
               fontSize: _widthScale * 18,
@@ -138,6 +153,23 @@ class _CancelAppointmentState extends State<CancelAppointment> {
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                var date = output['Date'].split('-');
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                var finalDate =
+                    getDate + " " + months[mon - 1] + ', ' + date[0];
                 return output == null
                     ? Container(
                         height: _heightScale * 650,
@@ -160,11 +192,7 @@ class _CancelAppointmentState extends State<CancelAppointment> {
                                 height: _heightScale * 32,
                               ),
                               Appointment(
-                                  "Booking id: ",
-                                  output['orderId']
-                                      .toString()
-                                      .replaceRange(0, 6, ""),
-                                  text9),
+                                  "Booking id: ", output['orderId'], text9),
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
@@ -176,13 +204,15 @@ class _CancelAppointmentState extends State<CancelAppointment> {
                                   future: getDataProfile(),
                                   builder: (context, snapShot) {
                                     return Appointment(
-                                        "Name: ",
+                                        "Professional Name: ",
                                         // output["Aspirant"] == responseid['_id']
                                         //     ?
-                                        output['professionalname'] != null
-                                            ? getCapitalizeStringaa(
-                                                output['professionalname'])
-                                            : "No Detail",
+                                        output['isAspirantAnonymous'] == "true"
+                                            ? "Anonymous"
+                                            : output['professionalname'] != null
+                                                ? getCapitalizeStringaa(
+                                                    output['professionalname'])
+                                                : "No Detail",
                                         // : output['professionalname'] != null
                                         //     ? getCapitalizeStringaa(
                                         //         output['aspirantname'])
@@ -192,17 +222,130 @@ class _CancelAppointmentState extends State<CancelAppointment> {
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
-                              Appointment(
-                                  "Status: ", output['status'], Colors.red),
+                              Row(
+                                children: [
+                                  Appointment(
+                                      "Status: ", output['status'], Colors.red),
+                                  SizedBox(
+                                    width: _widthScale * 151,
+                                  ),
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          isLoading = !isLoading;
+                                        });
+                                      },
+                                      child: Icon(isLoading
+                                          ? Icons.arrow_drop_down_sharp
+                                          : Icons.arrow_drop_up))
+                                ],
+                              ),
+                              SizedBox(
+                                height: _heightScale * 5,
+                              ),
+                              isLoading
+                                  ? Container(
+                                      width: double.infinity,
+                                      height: _heightScale * 100,
+                                      color: white(context).withOpacity(0.7),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            height: _heightScale * 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: _widthScale * 10,
+                                              ),
+                                              // SizedBox(
+                                              //   width: MediaQuery.of(context).size.width * 0.08,
+                                              // ),
+                                              Text(
+                                                output['Date']
+                                                    .toString()
+                                                    .replaceRange(10, 24, ""),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                "-  Cancelled",
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _heightScale * 15,
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: _widthScale * 10,
+                                              ),
+                                              // SizedBox(
+                                              //   width: MediaQuery.of(context).size.width * 0.08,
+                                              // ),
+                                              Text(
+                                                "Professional Response : ",
+                                                // resout[widget.index]['Date']
+                                                //     .toString()
+                                                //     .replaceRange(10, 24, ""),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 12,
+                                                  color: black(context),
+                                                  // fontWeight: FontWeight.w600
+                                                ),
+                                              ),
+                                              Text(
+                                                output['approvedbyprofessional']
+                                                    .toString()
+                                                    .toUpperCase(),
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: _heightScale * 10,
+                                          ),
+                                          // Row(
+                                          //   children: [
+                                          //     SizedBox(
+                                          //       width: _widthScale * 10,
+                                          //     ),
+                                          //     // SizedBox(
+                                          //     //   width: MediaQuery.of(context).size.width * 0.08,
+                                          //     // ),
+                                          //     Text(
+                                          //       "Awating. professional Response... ",
+                                          //       style: GoogleFonts.poppins(
+                                          //         fontSize: _widthScale * 12,
+                                          //         color: black(context),
+                                          //         // fontWeight: FontWeight.w600
+                                          //       ),
+                                          //     ),
+                                          //     Text(
+                                          //       " - ${output['approvedbyaspirant']}",
+                                          //       style: GoogleFonts.poppins(
+                                          //           fontSize: _widthScale * 12,
+                                          //           color: black(context)),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
                               SizedBox(
                                 height: _heightScale * 32,
                               ),
-                              Appointment(
-                                  "Date: ",
-                                  output['Date']
-                                      .toString()
-                                      .replaceRange(10, 24, ""),
-                                  text9),
+                              Appointment("Date: ", finalDate, text9),
                               SizedBox(
                                 height: _heightScale * 30,
                               ),

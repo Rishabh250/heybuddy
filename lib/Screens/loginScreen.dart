@@ -17,6 +17,7 @@ import 'package:heybuddy/shared_preference/user.dart';
 import 'package:heybuddy/widgets/custom_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -88,6 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final storage = new FlutterSecureStorage();
   _onsubmit(BuildContext context) async {
     var firetkn = await firebaseMessaging.getToken();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("fcmToken", firetkn.toString());
     print("tkn is $firetkn");
     var check;
     check = await loginPreference?.getLoginStatus();
@@ -129,9 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
       var response = await SignIn.signIn(_email.text, _password.text, firetkn);
       if (response == true) {
         await login?.setLogin(true);
-        setState(() {
-          isLoading1 = true;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading1 = true;
+          });
+        }
         // showToast();
         Navigator.pushAndRemoveUntil(
             context,

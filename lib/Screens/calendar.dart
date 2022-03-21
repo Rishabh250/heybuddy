@@ -4,11 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/aspirant_appointment_schedule.dart';
 import 'package:heybuddy/Screens/aspirant_booking_update.dart';
 import 'package:heybuddy/Screens/aspirant_meeting_complete.dart';
+import 'package:heybuddy/Screens/aspirant_refund.dart';
 import 'package:heybuddy/Screens/aspirantappointment_booked.dart';
 import 'package:heybuddy/Screens/cancel_appointment.dart';
+import 'package:heybuddy/Screens/pro_cancel.dart';
 import 'package:heybuddy/Screens/prof_booking_update.dart';
 import 'package:heybuddy/Screens/profess_appointment_schedule.dart';
 import 'package:heybuddy/Screens/professional_addComments.dart';
+import 'package:heybuddy/Screens/professional_meeting_completed.dart';
 import 'package:heybuddy/Screens/professionalappointment_booked.dart';
 import 'package:heybuddy/Screens/proff_cancle_booking.dart';
 import 'package:heybuddy/Screens/welcome.dart';
@@ -31,8 +34,11 @@ import 'package:heybuddy/widgets/custom_drop_down_button.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'aspirant_booked.dart';
+import 'professional_refund.dart';
+
 class Calendar extends StatefulWidget {
-  const Calendar({Key? key}) : super(key: key);
+  Calendar({Key? key}) : super(key: key);
 
   @override
   _CalendarState createState() => _CalendarState();
@@ -133,56 +139,6 @@ class _CalendarState extends State<Calendar> {
   }
 
   var tkn = datam.read('f');
-  // chooseLogin() async {
-  //   value = await loginPreference?.getLoginStatus();
-  // }
-  // var inCheck;
-  // var upCheck;
-  // var inCheckk;
-  // // chooseLogin() async {
-  // //   val = await loginPreference?.getLoginStatus();
-  // //   // await innerCheckLogin();
-  // // }
-  // innerCheckLogin() async {
-  //   inCheck = await innerCheck?.getLogin();
-  //   setState(() {
-  //     print("incheckkkk$inCheck");
-  //   });
-  // }
-  // innerCheckLoginn() async {
-  //   inCheckk = await innerCheck?.getLoginn();
-  //   print("incheckp$inCheckk");
-  // }
-  // upperCheckLogin() async {
-  //   upCheck = await uperCheck?.getLoginStatus();
-  // }
-  // bool vvv = false;
-  // var response;
-  // var tkn = datam.read('f');
-  // Future getData() async {
-  //   response = await getdetails(tkn);
-  //   // Provider.of<Choose>(context, listen: false).changeFavs(response);
-  //   print("resssssss$response");
-  //   if (response == 'professional') {
-  //     // loginPreference?.setLoginStatus(false);
-  //     setState(() {
-  //       vvv = false;
-  //     });
-  //     innerCheck?.setLoginn(true);
-  //     innerCheck?.setLogin(false);
-  //     print("beech1");
-  //     return response;
-  //   } else if (response == 'aspirant') {
-  //     print("bee22");
-  //     setState(() {
-  //       vvv = true;
-  //     });
-  //     innerCheck?.setLogin(true);
-  //     innerCheck?.setLoginn(false);
-  //     // loginPreference?.setLoginStatus(true);
-  //     return response;
-  //   }
-  // }
 
   int page = 1;
 
@@ -190,46 +146,65 @@ class _CalendarState extends State<Calendar> {
   List resout = [];
   get2ndtabapi(page) async {
     valout = await secondTabPaymentmadeaspirant(tkn, page);
-    setState(() {
-      //   data = response;
-      if (page > 1) {
-        print("me chla");
-        // data.addAll(res);
-        resout = [
-          ...resout,
-          ...valout,
-        ];
-        refreshController.loadComplete();
-      } else {
-        print("Done");
-        resout = valout;
-      }
-      EasyLoading.dismiss();
-    });
+    if (mounted) {
+      setState(() {
+        //   data = response;
+        if (page > 1) {
+          print("me chla");
+          // data.addAll(res);
+          resout = [
+            ...resout,
+            ...valout,
+          ];
+          refreshController.loadComplete();
+        } else {
+          print("Done");
+          resout = valout;
+        }
+        EasyLoading.dismiss();
+      });
+    }
     // resout = valout;
     // return resout;
   }
+
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
 
   var valoutpro;
   var resoutpro;
   get2ndtabapiprofessional(page, valueChoose) async {
     valoutpro = await secondTabPaymentsprofessional(tkn, page, valueChoose);
-    setState(() {
-      //   data = response;
-      if (page > 1) {
-        print("me chla");
-        // data.addAll(res);
-        resoutpro = [
-          ...resoutpro,
-          ...valoutpro,
-        ];
-        refreshController.loadComplete();
-      } else {
-        print("Done");
-        resoutpro = valoutpro;
-      }
-      EasyLoading.dismiss();
-    });
+    if (mounted) {
+      setState(() {
+        //   data = response;
+        if (page > 1) {
+          print("me chla");
+          // data.addAll(res);
+          resoutpro = [
+            ...resoutpro,
+            ...valoutpro,
+          ];
+          refreshController.loadComplete();
+        } else {
+          print("Done");
+          resoutpro = valoutpro;
+        }
+        EasyLoading.dismiss();
+      });
+    }
     // resout = valout;
     // return resout;
   }
@@ -268,6 +243,8 @@ class _CalendarState extends State<Calendar> {
 
   var singlet;
   singleTrans(int i) async {
+    print("QQQWWW");
+
     singlet = await SingleTransaction.transaction(resout[i]['orderId'], tkn);
     print("trans id$singlet");
     isChg();
@@ -279,6 +256,8 @@ class _CalendarState extends State<Calendar> {
     singletpro =
         await SingleTransaction.transaction(resoutpro[i]['orderId'], tkn);
     print("trans id$singlet");
+    print("QQQWWW" + singletpro.toString());
+
     isChgpro();
     return singletpro;
   }
@@ -294,6 +273,8 @@ class _CalendarState extends State<Calendar> {
   bool flagval = false;
   String isChg() {
     if (responseid['_id'] == singlet['Aspirant']) {
+      print("QQQWWW : 2");
+
       // setState(() {
       //   flagval = true;
       //   print("flagval$flagval");
@@ -310,10 +291,14 @@ class _CalendarState extends State<Calendar> {
 
   String isChgpro() {
     if (responseid['_id'] == singletpro['Aspirant']) {
-      // setState(() {
-      //   flagval = true;
-      //   print("flagval$flagval");
-      // });
+      print("QQQWWW : 2");
+
+      setState(() {
+        flagval = true;
+        print("flagval$flagval");
+        print("QQQWWW : 2");
+      });
+
       return "Booking made";
     } else {
       return "Booking received";
@@ -324,37 +309,8 @@ class _CalendarState extends State<Calendar> {
     }
   }
 
-  String wheretogo(int index) {
-    if (resout[index]['status'] == "Confirmed") {
-      return "Confirmed";
-    } else if (resout[index]['status'] == "Cancelled") {
-      if (flagval == true) {
-        return "Cancelled"; // amount refuund screen
-      } else {
-        return "Cancelled";
-      }
-    } else {
-      // if i am aspirant if(transaction.Aspirant == profile._id)
-      if (flagval == true) {
-        if (resout[index]['approvedbyprofessional'] == 'pending') {
-          return "Booked";
-        } else if (resout[index]['approvedbyprofessional'] == "yes") {
-          return "Action Required";
-        }
-      } else {
-        //if i am professional if(transaction.Professional == profile._id)
-        if (resout[index]['approvedbyprofessional'] == "pending") {
-          return "Action Required";
-        } else if (resout[index]['approvedbyaspirant'] == "pending") {
-          return "Booked";
-        }
-      }
-    }
-    return "a";
-  }
-
   List<String> _locations = ["Bookings Made", "Bookings Received"];
-  var valueChoose = "Bookings Made";
+  var valueChoose = "Bookings Received";
   @override
   Widget build(BuildContext context) {
     // isChg();
@@ -484,91 +440,55 @@ class _CalendarState extends State<Calendar> {
                                                         return topicspro(
                                                           context,
                                                           "assets/Group 805.png",
-                                                          "Topic: ",
+                                                          "Skill: ",
                                                           resoutpro[index]
-                                                              ['topic'],
+                                                                  ['skill']
+                                                              .toString()
+                                                              .toUpperCase(),
                                                           "Status: ",
-                                                          // vvv == false &&
-                                                          //         resout[index]['approvedbyprofessional'] ==
-                                                          //             'yes' &&
-                                                          //         resout[index]['status'] ==
-                                                          //             "Confirmed" &&
-                                                          //         resout[index]['approvedbyaspirant'] ==
-                                                          //             'yes'
-                                                          //     ? "Confirmed"
-                                                          //     : vvv == false &&
-                                                          //             resout[index]['approvedbyprofessional'] ==
-                                                          //                 'pending' &&
-                                                          //             resout[index]
-                                                          //                     ['status'] ==
-                                                          //                 "Booked"
-                                                          //         ? "Action Required"
-                                                          //         : vvv == true &&
-                                                          //                 resout[index]['approvedbyprofessional'] ==
-                                                          //                     'yes' &&
-                                                          //                 resout[index][
-                                                          //                         'status'] ==
-                                                          //                     "Confirmed" &&
-                                                          //                 resout[index][
-                                                          //                         'approvedbyaspirant'] ==
-                                                          //                     'yes'
-                                                          //             ? "Confirmed"
-                                                          //             : vvv == true &&
-                                                          //                     resout[index][
-                                                          //                             'approvedbyprofessional'] ==
-                                                          //                         'yes' &&
-                                                          //                     resout[index][
-                                                          //                             'status'] ==
-                                                          //                         "Booked" &&
-                                                          //                     resout[index]
-                                                          //                             ['approvedbyaspirant'] ==
-                                                          //                         'pending'
-                                                          //                 ? "Action Required"
-                                                          //                 : "Booked",
                                                           resoutpro[index]
                                                               ['screenstatus'],
                                                           resoutpro[index][
                                                                       'screenstatus'] ==
-                                                                  "1"
-                                                              ? "Confirmed"
+                                                                  "11"
+                                                              ? "Completed"
                                                               : resoutpro[index]
                                                                           [
                                                                           'screenstatus'] ==
-                                                                      "2"
+                                                                      "14"
                                                                   ? "Cancelled"
                                                                   : resoutpro[index]
                                                                               [
                                                                               'screenstatus'] ==
-                                                                          "3"
-                                                                      ? "Cancelled"
+                                                                          "13"
+                                                                      ? "Refunded"
                                                                       : resoutpro[index]['screenstatus'] ==
-                                                                              "4"
-                                                                          ? "Booked"
-                                                                          : resoutpro[index]['screenstatus'] == "5"
-                                                                              ? "Action Required"
-                                                                              : resoutpro[index]['screenstatus'] == "6"
-                                                                                  ? "Action Required"
-                                                                                  : resoutpro[index]['screenstatus'] == "7"
-                                                                                      ? "Booked"
-                                                                                      : "null",
+                                                                              "0"
+                                                                          ? "Completed"
+                                                                          : resoutpro[index]['screenstatus'] == "10"
+                                                                              ? "Confirmed"
+                                                                              : resoutpro[index]['screenstatus'] == "1"
+                                                                                  ? "Confirmed"
+                                                                                  : resoutpro[index]['screenstatus'] == "2"
+                                                                                      ? "Cancelled"
+                                                                                      : resoutpro[index]['screenstatus'] == "3"
+                                                                                          ? "Cancelled"
+                                                                                          : resoutpro[index]['screenstatus'] == "4"
+                                                                                              ? "Booked"
+                                                                                              : resoutpro[index]['screenstatus'] == "5"
+                                                                                                  ? "Action Required"
+                                                                                                  : resoutpro[index]['screenstatus'] == "6"
+                                                                                                      ? "Action Required"
+                                                                                                      : resoutpro[index]['screenstatus'] == "7"
+                                                                                                          ? "Booked"
+                                                                                                          : "null",
                                                           resoutpro[index]
                                                                   ['Date']
                                                               .toString()
                                                               .replaceRange(
                                                                   10, 24, ""),
-
                                                           "",
                                                           index,
-                                                          // resout[index][
-                                                          //             "Aspirant"] ==
-                                                          //         responseid[
-                                                          //             '_id']
-                                                          //     ? "Booking made"
-                                                          //     : "Booking Received",
-                                                          // responseid['_id'] ==
-                                                          //         singlet['Aspirant']
-                                                          //     ? "Booking made"
-                                                          //     : "Booking Received",
                                                         );
                                                         // });
                                                       }),
@@ -644,102 +564,59 @@ class _CalendarState extends State<Calendar> {
                                                           : resout.length,
                                                       itemBuilder:
                                                           (context, index) {
+                                                        print("TTTTTTTTTT" +
+                                                            resout[index][
+                                                                    'screenstatus']
+                                                                .toString());
+                                                        print("TTTTTTTTTT" +
+                                                            resout[index]
+                                                                    ['status']
+                                                                .toString());
                                                         return topics(
                                                           context,
                                                           "assets/Group 805.png",
-                                                          "Topic: ",
-                                                          resout[index]
-                                                              ['topic'],
+                                                          "Skill: ",
+                                                          resout[index]['skill']
+                                                              .toString()
+                                                              .toUpperCase(),
                                                           "Status: ",
-                                                          // vvv == false &&
-                                                          //         resout[index]['approvedbyprofessional'] ==
-                                                          //             'yes' &&
-                                                          //         resout[index]['status'] ==
-                                                          //             "Confirmed" &&
-                                                          //         resout[index]['approvedbyaspirant'] ==
-                                                          //             'yes'
-                                                          //     ? "Confirmed"
-                                                          //     : vvv == false &&
-                                                          //             resout[index]['approvedbyprofessional'] ==
-                                                          //                 'pending' &&
-                                                          //             resout[index]
-                                                          //                     ['status'] ==
-                                                          //                 "Booked"
-                                                          //         ? "Action Required"
-                                                          //         : vvv == true &&
-                                                          //                 resout[index]['approvedbyprofessional'] ==
-                                                          //                     'yes' &&
-                                                          //                 resout[index][
-                                                          //                         'status'] ==
-                                                          //                     "Confirmed" &&
-                                                          //                 resout[index][
-                                                          //                         'approvedbyaspirant'] ==
-                                                          //                     'yes'
-                                                          //             ? "Confirmed"
-                                                          //             : vvv == true &&
-                                                          //                     resout[index][
-                                                          //                             'approvedbyprofessional'] ==
-                                                          //                         'yes' &&
-                                                          //                     resout[index][
-                                                          //                             'status'] ==
-                                                          //                         "Booked" &&
-                                                          //                     resout[index]
-                                                          //                             ['approvedbyaspirant'] ==
-                                                          //                         'pending'
-                                                          //                 ? "Action Required"
-                                                          //                 : "Booked",
                                                           resout[index]
                                                               ['screenstatus'],
                                                           resout[index][
                                                                       'screenstatus'] ==
-                                                                  "1"
-                                                              ? "Confirmed"
+                                                                  "0"
+                                                              ? "Completed"
                                                               : resout[index][
                                                                           'screenstatus'] ==
-                                                                      "2"
-                                                                  ? "Cancelled"
+                                                                      "1"
+                                                                  ? "Confirmed"
                                                                   : resout[index]
                                                                               [
                                                                               'screenstatus'] ==
-                                                                          "3"
-                                                                      ? "Cancelled"
+                                                                          "13"
+                                                                      ? "Refunded"
                                                                       : resout[index]['screenstatus'] ==
-                                                                              "4"
-                                                                          ? "Booked"
-                                                                          : resout[index]['screenstatus'] == "5"
-                                                                              ? "Action Required"
-                                                                              : resout[index]['screenstatus'] == "6"
-                                                                                  ? "Action Required"
-                                                                                  : resout[index]['screenstatus'] == "7"
+                                                                              "14"
+                                                                          ? "Refunded"
+                                                                          : resout[index]['screenstatus'] == "2"
+                                                                              ? "Cancelled"
+                                                                              : resout[index]['screenstatus'] == "3"
+                                                                                  ? "Cancelled"
+                                                                                  : resout[index]['screenstatus'] == "4"
                                                                                       ? "Booked"
-                                                                                      : "null",
+                                                                                      : resout[index]['screenstatus'] == "5"
+                                                                                          ? "Action Required"
+                                                                                          : resout[index]['screenstatus'] == "6"
+                                                                                              ? "Action Required"
+                                                                                              : resout[index]['screenstatus'] == "7"
+                                                                                                  ? "Booked"
+                                                                                                  : "null",
                                                           resout[index]['Date']
                                                               .toString()
                                                               .replaceRange(
                                                                   10, 24, ""),
-                                                          // "",
-                                                          // resout[index]['status'] == "Booked"
-                                                          //     ? Colors.orange
-                                                          //     : resout[index]['status'] ==
-                                                          //             "Action Required"
-                                                          //         ? Colors.red
-                                                          //         : resout[index]['status'] ==
-                                                          //                 "Cancelled"
-                                                          //             ? Colors.red
-                                                          //             : Colors.green,
-                                                          // "12:00 - 12:30 pm",
                                                           "",
                                                           index,
-                                                          // resout[index][
-                                                          //             "Aspirant"] ==
-                                                          //         responseid[
-                                                          //             '_id']
-                                                          //     ? "Booking made"
-                                                          //     : "Booking Received",
-                                                          // responseid['_id'] ==
-                                                          //         singlet['Aspirant']
-                                                          //     ? "Booking made"
-                                                          //     : "Booking Received",
                                                         );
                                                         // });
                                                       }),
@@ -814,26 +691,24 @@ class _CalendarState extends State<Calendar> {
     double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
 
     var word = Provider.of<Favourite>(context).fav;
-    // upCheck == true
-    //     ? (val == false
-    //         ? Navigator.push(
-    //             context, MaterialPageRoute(builder: (context) => Setting()))
-    //         : null)
-    //     : inCheck == true
-    //         //  : (inCheck == true||inCheckk == false)
-    //         ? null
-    //         : inCheck == null
-    //             ? CircularProgressIndicator()
-    //             : Navigator.push(context,
-    //                 MaterialPageRoute(builder: (context) => Setting()));
 
     void navigatePage(String val) {
+      if (val == "0") {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AspirantMeetingComplete(
+                      index: resout[i]['orderId'],
+                      getID: resout[i]['_id'],
+                    )));
+      }
       if (val == "1") {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfessionalAppointmentBooked(
+                builder: (context) => AspirantAppointmentBooked(
                       index: resout[i]['orderId'],
+                      getId: resout[i]['_id'],
                     )));
       } else if (val == "2") {
         // showAlertDialog();
@@ -853,6 +728,8 @@ class _CalendarState extends State<Calendar> {
                       index: resout[i]['orderId'],
                     )));
       } else if (val == "5") {
+        print("QQQWWW : 25");
+
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -870,7 +747,15 @@ class _CalendarState extends State<Calendar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfessionalsBookingUpdate(
+                builder: (context) => AspirantBookingUpdate(
+                      index: resout[i]['orderId'],
+                    )));
+      } else if (val == "13") {
+        // showAlertDialog();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AspirantRefund(
                       index: resout[i]['orderId'],
                     )));
       }
@@ -885,6 +770,12 @@ class _CalendarState extends State<Calendar> {
       child: FutureBuilder(
           future: getDataProfile(),
           builder: (context, snapShot) {
+            var date = subtitle.split('-');
+
+            var mon = int.parse(date[1]);
+
+            var finalDate = date[2] + " " + months[mon - 1] + ', ' + date[0];
+
             return Column(
               children: [
                 ListTile(
@@ -940,25 +831,20 @@ class _CalendarState extends State<Calendar> {
                           Row(
                             children: [
                               Text(
-                                title5,
-                                style: GoogleFonts.poppins(
-                                  fontSize: _widthScale * 12,
-                                  color: backgroundColor,
-                                ),
-                              ),
-                              Text(
                                 title99,
                                 style: GoogleFonts.poppins(
                                   fontSize: _widthScale * 12,
-                                  color: title99 == "Booked"
-                                      ? Colors.orange
-                                      : title99 == "Confirmed"
-                                          ? Colors.green
-                                          : title99 == "Action Required"
-                                              ? Colors.red
-                                              : title99 == "Cancelled"
+                                  color: title99 == "Completed"
+                                      ? Colors.green
+                                      : title99 == "Booked"
+                                          ? Colors.orange
+                                          : title99 == "Confirmed"
+                                              ? Colors.green
+                                              : title99 == "Action Required"
                                                   ? Colors.red
-                                                  : Colors.black,
+                                                  : title99 == "Cancelled"
+                                                      ? Colors.red
+                                                      : Colors.black,
                                 ),
                               ),
                             ],
@@ -985,9 +871,12 @@ class _CalendarState extends State<Calendar> {
                             child: Text(
                               resout[i]["Aspirant"] == responseid['_id']
                                   ? getCapitalizeStringaa(
-                                      resout[i]['professionalname'] != null
-                                          ? resout[i]['professionalname']
-                                          : "")
+                                      resout[i]['professionalname'] == null ||
+                                              resout[i]
+                                                      ['isAspirantAnonymous'] ==
+                                                  "true"
+                                          ? "Anonymous"
+                                          : resout[i]['professionalname'])
                                   : getCapitalizeStringaa(
                                       resout[i]['aspirantname'] != null
                                           ? resout[i]['aspirantname']
@@ -1009,7 +898,7 @@ class _CalendarState extends State<Calendar> {
                         children: [
                           Column(
                             children: [
-                              Text(subtitle,
+                              Text(finalDate,
                                   style: GoogleFonts.poppins(
                                     fontSize: _widthScale * 12,
                                     color: text9,
@@ -1105,12 +994,41 @@ class _CalendarState extends State<Calendar> {
     //                 MaterialPageRoute(builder: (context) => Setting()));
 
     void navigatePagepro(String val) {
-      if (val == "1") {
+      if (val == "0") {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AspirantMeetingComplete(
+                      index: resoutpro[i]['orderId'],
+                      getID: resoutpro[i]['_id'],
+                    )));
+      }
+
+      if (val == "11") {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfessionalAppointmentCompleted(
+                      index: resoutpro[i]['orderId'],
+                      getId: resoutpro[i]['_id'],
+                    )));
+      } else if (val == "10") {
+        // showAlertDialog();
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ProfessionalAppointmentBooked(
                       index: resoutpro[i]['orderId'],
+                      getId: resoutpro[i]['_id'],
+                    )));
+      } else if (val == "1") {
+        // showAlertDialog();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AspirantAppointmentBooked(
+                      index: resoutpro[i]['orderId'],
+                      getId: resout[i]['_id'],
                     )));
       } else if (val == "2") {
         // showAlertDialog();
@@ -1120,8 +1038,21 @@ class _CalendarState extends State<Calendar> {
                 builder: (context) => CancelAppointment(
                       index: resoutpro[i]['orderId'],
                     )));
+      } else if (val == "14") {
+        // showAlertDialog();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProCancel(
+                      index: resoutpro[i]['orderId'],
+                    )));
       } else if (val == "3") {
-        return null;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CancelAppointment(
+                      index: resoutpro[i]['orderId'],
+                    )));
       } else if (val == "4") {
         Navigator.push(
             context,
@@ -1129,7 +1060,18 @@ class _CalendarState extends State<Calendar> {
                 builder: (context) => AspirantBookingUpdate(
                       index: resoutpro[i]['orderId'],
                     )));
+      }
+      if (val == "13") {
+        // showAlertDialog();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AspirantRefund(
+                      index: resoutpro[i]['orderId'],
+                    )));
       } else if (val == "5") {
+        print("QQQWWW : 251");
+
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -1141,8 +1083,7 @@ class _CalendarState extends State<Calendar> {
             context,
             MaterialPageRoute(
                 builder: (context) => ProfessionalAppointmentSchedule(
-                      index: resoutpro[i]['orderId'],
-                    )));
+                    index: resoutpro[i]['orderId'])));
       } else if (val == "7") {
         Navigator.push(
             context,
@@ -1155,6 +1096,7 @@ class _CalendarState extends State<Calendar> {
 
     return InkWell(
       onTap: () async {
+        // print("QQQWWW" + resoutpro[i]['orderId'].toString());
         output =
             await UniqueUserCalendar.uniqueUser(resoutpro[i]['orderId'], tkn);
         singleTranspro(i);
@@ -1163,6 +1105,11 @@ class _CalendarState extends State<Calendar> {
       child: FutureBuilder(
           future: getDataProfile(),
           builder: (context, snapShot) {
+            var date = subtitle.split('-');
+
+            var mon = int.parse(date[1]);
+
+            var finalDate = date[2] + " " + months[mon - 1] + ', ' + date[0];
             return Column(
               children: [
                 ListTile(
@@ -1221,25 +1168,23 @@ class _CalendarState extends State<Calendar> {
                           Row(
                             children: [
                               Text(
-                                title5,
-                                style: GoogleFonts.poppins(
-                                  fontSize: _widthScale * 12,
-                                  color: backgroundColor,
-                                ),
-                              ),
-                              Text(
                                 title99,
                                 style: GoogleFonts.poppins(
                                   fontSize: _widthScale * 12,
-                                  color: title99 == "Booked"
-                                      ? Colors.orange
-                                      : title99 == "Confirmed"
-                                          ? Colors.green
-                                          : title99 == "Action Required"
-                                              ? Colors.red
-                                              : title99 == "Cancelled"
+                                  color: title99 == "Completed"
+                                      ? Colors.green
+                                      : title99 == "Booked"
+                                          ? Colors.orange
+                                          : title99 == "Confirmed"
+                                              ? Colors.green
+                                              : title99 == "Action Required"
                                                   ? Colors.red
-                                                  : Colors.black,
+                                                  : title99 == "Cancelled"
+                                                      ? Colors.red
+                                                      : title99 == "Refunded"
+                                                          ? Color.fromARGB(
+                                                              255, 169, 211, 18)
+                                                          : Colors.black,
                                 ),
                               ),
                             ],
@@ -1265,14 +1210,16 @@ class _CalendarState extends State<Calendar> {
                             padding: EdgeInsets.only(top: _heightScale * 10.0),
                             child: Text(
                               resoutpro[i]["Aspirant"] == responseid['_id']
-                                  ? getCapitalizeStringaa(
-                                      resoutpro[i]['professionalname'] != null
-                                          ? resoutpro[i]['professionalname']
-                                          : "")
-                                  : getCapitalizeStringaa(
-                                      resoutpro[i]['aspirantname'] != null
-                                          ? resoutpro[i]['aspirantname']
-                                          : ""),
+                                  ? getCapitalizeStringaa(resoutpro[i]
+                                              ['isAspirantAnonymous'] !=
+                                          "false"
+                                      ? "Anonymous"
+                                      : resoutpro[i]['professionalname'])
+                                  : getCapitalizeStringaa(resoutpro[i]
+                                              ['isAspirantAnonymous'] ==
+                                          "true"
+                                      ? "Anonymous"
+                                      : resoutpro[i]['aspirantname']),
                               style: GoogleFonts.poppins(
                                   fontSize: _widthScale * 12,
                                   color: Styles.isDark
@@ -1293,7 +1240,7 @@ class _CalendarState extends State<Calendar> {
                         children: [
                           Column(
                             children: [
-                              Text(subtitle,
+                              Text(finalDate,
                                   style: GoogleFonts.poppins(
                                     fontSize: _widthScale * 12,
                                     color: Styles.isDark
@@ -1353,118 +1300,3 @@ class _CalendarState extends State<Calendar> {
     );
   }
 }
-
-
-
-// void navigatePage(String val) {
-//     print("checkfor$value");
-//     if (val == "Booked") {
-//       upCheck == true
-//           ? (value == false
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => ProfessionalAppointmentBooked(
-//                             index: i,
-//                           )))
-//               : Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => AspirantBookingUpdate(
-//                             index: i,
-//                           ))))
-//           : inCheck == true
-//               //  : (inCheck == true||inCheckk == false)
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => AspirantBookingUpdate(
-//                             index: i,
-//                           )))
-//               : inCheck == null
-//                   ? CircularProgressIndicator()
-//                   : Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                           builder: (context) => ProfessionalAppointmentBooked(
-//                                 index: i,
-//                               )));
-//     } else if (val == "Action Required") {
-//       upCheck == true
-//           ? (value == false
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => ProfessionalAppointmentSchedule(
-//                             index: i,
-//                           )))
-//               : Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => AspirantAppointmentSchedule(
-//                             index: i,
-//                           ))))
-//           : inCheck == true
-//               //  : (inCheck == true||inCheckk == false)
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => AspirantAppointmentSchedule(
-//                             index: i,
-//                           )))
-//               : inCheck == null
-//                   ? CircularProgressIndicator()
-//                   : Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                           builder: (context) =>
-//                               ProfessionalAppointmentSchedule(
-//                                 index: i,
-//                               )));
-//     } else if (val == "Confirmed") {
-//       upCheck == true
-//           ? (value == false
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => ProfessionalAppointmentBooked(
-//                             index: i,
-//                           )))
-//               : Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => AspirantAppointmentBooked(
-//                             index: i,
-//                           ))))
-//           : inCheck == true
-//               //  : (inCheck == true||inCheckk == false)
-//               ? Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) =>
-//                           AspirantAppointmentBooked(index: i)))
-//               : inCheck == null
-//                   ? CircularProgressIndicator()
-//                   : Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                           builder: (context) => ProfessionalAppointmentBooked(
-//                                 index: i,
-//                               )));
-//       // if (value == false) {
-//       //   Navigator.push(
-//       //       context,
-//       //       MaterialPageRoute(
-//       //           builder: (context) => ProfessionalAddComments()));
-//       // } else
-//       //   Navigator.push(
-//       //       context,
-//       //       MaterialPageRoute(
-//       //           builder: (context) => AspirantMeetingComplete()));
-//     }
-//     return null;
-//     // Navigator.push(
-//     //     context,
-//     //     MaterialPageRoute(
-//     //         builder: (context) => ProfessionalCancleBooking()));
-//   }

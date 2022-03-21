@@ -48,9 +48,11 @@ class _SearchPageState extends State<SearchPage> {
 
   getSearch(page, name) async {
     res = await getSearchUsers(page, name);
-    setState(() {
-      filterUsers = res;
-    });
+    if (mounted) {
+      setState(() {
+        filterUsers = res;
+      });
+    }
     // setState(() {
     //   //   data = response;
     //   if (page > 1) {

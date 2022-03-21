@@ -28,6 +28,8 @@ secondTabPayment(var token, page) async {
 }
 
 secondTabPaymentmadeaspirant(var token, page) async {
+  print("RRRRRRRRRRRRRRRRR " + token.toString());
+  print("RRRRRRRRRRRRRRRRR " + page.toString());
   http.Response res = await http.get(
     Uri.parse(
         'https://heybuddybackend.herokuapp.com/api/getTransactionsPaymentMade?page=$page'),
@@ -57,9 +59,10 @@ secondTabPaymentsprofessional(var token, page, chooseValue) async {
   } else {
     mode = 'getTransactionsPaymentReceived';
   }
+  print("QQQQQQQQ" + "$page");
+  print("QQQQQQQQ" + "$mode");
   http.Response res = await http.get(
-    Uri.parse(
-        'https://heybuddybackend.herokuapp.com/api/$mode?page=$page'),
+    Uri.parse('https://heybuddybackend.herokuapp.com/api/$mode?page=$page'),
     headers: {"x-access-token": token},
   );
   var share1 = json.decode(res.body);

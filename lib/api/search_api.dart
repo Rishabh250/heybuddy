@@ -6,9 +6,8 @@ import 'package:heybuddy/api/signin_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
-
-
 getSearchUsers(var page, var name) async {
+  print("sharesssss" + name.toString());
   http.Response res = await http.get(
     Uri.parse(
         'http://heybuddybackend.herokuapp.com/api/search_bar?page=$page&msg=$name'),
@@ -30,8 +29,7 @@ getSearchUsers(var page, var name) async {
   //return {"statusCode": res.statusCode, "response": share1};
 }
 
-
-getSearchUserss(var page, var name) async {
+getUser(var page, var name) async {
   http.Response res = await http.get(
     Uri.parse(
         'http://heybuddybackend.herokuapp.com/api/search_bar?page=$page&msg=$name'),

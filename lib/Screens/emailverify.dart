@@ -26,6 +26,7 @@ class EmailVerifiy extends StatefulWidget {
   var password;
   var phone;
   var tkn;
+  var refCode;
   // final bool verify;
   EmailVerifiy(
       {required this.who,
@@ -34,7 +35,8 @@ class EmailVerifiy extends StatefulWidget {
       required this.gender,
       required this.password,
       required this.phone,
-      required this.tkn});
+      required this.tkn,
+      required this.refCode});
   @override
   State<EmailVerifiy> createState() => _EmailVerifiyState();
 }
@@ -82,8 +84,18 @@ class _EmailVerifiyState extends State<EmailVerifiy> {
     } else if (output == true) {
       //  else {
 
-      var response = await SignUp.signUp(widget.who, widget.email, widget.name,
-          widget.gender, widget.password, widget.phone, firetkn);
+      var response = await SignUp.signUp(
+          widget.who,
+          widget.email,
+          widget.name,
+          widget.gender,
+          widget.password,
+          widget.phone,
+          firetkn,
+          widget.refCode,
+          context);
+
+      print(response);
 
       if (response == true) {
         // apihit();
@@ -102,74 +114,21 @@ class _EmailVerifiyState extends State<EmailVerifiy> {
         print("is value printed");
         await login?.setLogin(false);
         print("hhhh");
-        const snackBar = SnackBar(
-          content: Text("Something went wrong ! "),
-          backgroundColor: text6,
-          duration: Duration(milliseconds: 2000),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        setState(() {
-          isLoading1 = false;
-        });
+        // const snackBar = SnackBar(
+        //   content: Text("Something went wrong ! "),
+        //   backgroundColor: text6,
+        //   duration: Duration(milliseconds: 2000),
+        // );
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        if (mounted) {
+          setState(() {
+            isLoading1 = false;
+          });
+        }
       }
     }
   }
-  //   if (widget.verify == true) {
-  //     print(widget.verify);
-  //     print('${response.toString()}op');
-  //     print(pin);
-  //     if (response != true) {
-  //       const snackBar = SnackBar(
-  //         content: Text("incorrect pin"),
-  //         duration: Duration(milliseconds: 2000),
-  //       );
-  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //     } else if (response == null) {
-  //       print('null');
-  //       const snackBar = SnackBar(
-  //         content: Text("enter valid otp"),
-  //         duration: Duration(milliseconds: 2000),
-  //       );
-  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //     } else if (response == true) {
-  //       // ignore: curly_braces_in_flow_control_structures
-  //       Navigator.pushAndRemoveUntil(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => VerifiedScreen()),
-  //           (route) => false);
-  //     }
-  //   } else if (widget.verify == false) {
-  //     print(widget.verify);
-  //     print('${response.toString()}oo');
-  //     print(pin);
-  //     if (response == false) {
-  //       print('mhiii');
-  //       const snackBar = SnackBar(
-  //         content: Text("incorrect pin"),
-  //         duration: Duration(milliseconds: 2000),
-  //       );
-  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //     } else if (response == null) {
-  //       print('null');
-  //       const snackBar = SnackBar(
-  //         content: Text("enter valid otp"),
-  //         duration: Duration(milliseconds: 2000),
-  //       );
-  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //     } else if (response == true) {
-  //       print('haan');
-  //       // ignore: curly_braces_in_flow_control_structures
-  //       Navigator.pushAndRemoveUntil(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => VerifiedScreen()),
-  //           (route) => false);
-  //       //  Navigator.push(
-  //       //    context, MaterialPageRoute(builder: (context) => VerifiedScreen()));
-  //     }
-  //   }
-  // }
 
-  // bool verified = false;
   void _onResend(BuildContext context) async {
     // var response = await ResendOtp.verify(widget.email);
     var output = await VerifyEmailVerification.verification(
@@ -189,14 +148,6 @@ class _EmailVerifiyState extends State<EmailVerifiy> {
     //   verified = true;
     // });
   }
-
-  // @override
-  // void initState() {
-  //   if (widget.verify == true) {
-  //     _onResend(context);
-  //   }
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +177,7 @@ class _EmailVerifiyState extends State<EmailVerifiy> {
                 height: 39 * _heightScale,
               ),
               Text(
-                'Please enter the Code sent on your email address to register',
+                'Please enter the Code sent on your email address ${widget.email} to register',
                 style: GoogleFonts.poppins(
                   fontSize: 13 * _widthScale,
                   fontWeight: FontWeight.w500,

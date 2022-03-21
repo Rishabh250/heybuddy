@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/color&font/colors.dart';
 
+import '../provider/styles.dart';
+
 // import '../services/circular_loading.dart';
 
 class CustomDropDownButton extends StatelessWidget {
@@ -39,7 +41,8 @@ class CustomDropDownButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: white(context).withOpacity(0.39), // Color.fromRGBO(0, 0, 0, .12),
+              color: white(context)
+                  .withOpacity(0.39), // Color.fromRGBO(0, 0, 0, .12),
             ),
             color: white(context).withOpacity(0.39),
           ),
@@ -53,8 +56,10 @@ class CustomDropDownButton extends StatelessWidget {
               ...items.map(
                 (e) => DropdownMenuItem(
                   child: Text(
-                    e,
+                    e.toString().toUpperCase(),
                     style: GoogleFonts.poppins(
+                        color: Styles.isDark ? whites.withOpacity(0.8) : text9,
+                        fontWeight: FontWeight.w600,
                         textStyle: TextStyle(
                             fontSize: _widthScale * 16, color: text12)),
                     //   style: CustomTextStyle.roboto9912W400(context),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/seeall_professional.dart';
 import 'package:heybuddy/Screens/seeall_skills.dart';
@@ -10,6 +11,7 @@ import 'package:heybuddy/api/signup_api.dart';
 import 'package:heybuddy/api/unique_user.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/provider/styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'education_new_experience.dart';
 
@@ -147,6 +149,25 @@ class _UserProfileState extends State<UserProfile> {
     //   height: size.height * 0.03,
     // );
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          leading: GestureDetector(
+            onTap: (() {
+              Get.back();
+            }),
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Styles.isDark ? text7 : Colors.black,
+            ),
+          ),
+          title: Text(
+            "Profile View",
+            style: TextStyle(
+                color: Styles.isDark ? text7 : Colors.black,
+                fontWeight: FontWeight.bold),
+          )),
       // backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
@@ -161,7 +182,7 @@ class _UserProfileState extends State<UserProfile> {
                     return SingleChildScrollView(
                       child: output == null
                           ? Container(
-                              height: _heightScale * 800,
+                              height: _heightScale * 900,
                               width: double.infinity,
                               child: Center(child: CircularProgressIndicator()))
                           : Column(
@@ -185,18 +206,6 @@ class _UserProfileState extends State<UserProfile> {
                                           SizedBox(
                                             height: _heightScale * 24,
                                             // width: size.width * 0.96,
-                                          ),
-                                          Container(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Icon(
-                                                Icons
-                                                    .arrow_back_ios_new_rounded,
-                                                color: black(context),
-                                              ),
-                                            ),
                                           ),
                                         ],
                                       ),
@@ -241,6 +250,10 @@ class _UserProfileState extends State<UserProfile> {
                                                         ? output['user'][0]
                                                                 ['company'][0]
                                                             ['company_name']
+                                                        : "Not Mentioned yet",
+                                                    z.isNotEmpty
+                                                        ? output['user'][0]
+                                                            ['HKTID']
                                                         : "Not Mentioned yet",
                                                   ),
                                                 ],
@@ -360,6 +373,8 @@ class _UserProfileState extends State<UserProfile> {
                                             right: _widthScale * 22.5,
                                             bottom: _heightScale * 15),
                                         child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Row(
                                               children: [
@@ -393,6 +408,7 @@ class _UserProfileState extends State<UserProfile> {
                                                           null
                                                       ? output['user'][0]['bio']
                                                       : "Not Mentioned Yet"),
+                                              textAlign: TextAlign.left,
                                               style: GoogleFonts.poppins(
                                                 fontSize: _widthScale * 14,
                                               ),
@@ -420,7 +436,7 @@ class _UserProfileState extends State<UserProfile> {
                                                 color: Styles.isDark
                                                     ? text6
                                                     : text5,
-                                                fontWeight: FontWeight.w500)),
+                                                fontWeight: FontWeight.bold)),
                                         SizedBox(
                                           width: _widthScale * 106,
                                         ),
@@ -527,7 +543,7 @@ class _UserProfileState extends State<UserProfile> {
                                           top: 10.0, bottom: 10),
                                       child: Center(
                                         child: Text(
-                                          "See All",
+                                          "See All ($y)",
                                           style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 14,
                                               color: text6),
@@ -554,7 +570,7 @@ class _UserProfileState extends State<UserProfile> {
                                                 color: Styles.isDark
                                                     ? text6
                                                     : text5,
-                                                fontWeight: FontWeight.w500)),
+                                                fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                   ),
@@ -649,7 +665,7 @@ class _UserProfileState extends State<UserProfile> {
                                           bottom: _heightScale * 10),
                                       child: Center(
                                         child: Text(
-                                          "See All",
+                                          "See All ($yy)",
                                           style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 14,
                                               color: text6),
@@ -670,13 +686,13 @@ class _UserProfileState extends State<UserProfile> {
                                       Padding(
                                         padding: EdgeInsets.only(
                                             top: _heightScale * 8.0),
-                                        child: Text("Skills Known",
+                                        child: Text("Skills",
                                             style: GoogleFonts.poppins(
                                                 fontSize: _widthScale * 18,
                                                 color: Styles.isDark
                                                     ? text6
                                                     : text5,
-                                                fontWeight: FontWeight.w500)),
+                                                fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                   ),
@@ -807,7 +823,7 @@ class _UserProfileState extends State<UserProfile> {
                                           bottom: _heightScale * 10),
                                       child: Center(
                                         child: Text(
-                                          "See All",
+                                          "See All (${x.length})",
                                           style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 14,
                                               color: text6),
@@ -816,166 +832,92 @@ class _UserProfileState extends State<UserProfile> {
                                     ),
                                   ),
                                 ),
+                                SizedBox(
+                                  height: 50,
+                                )
                               ],
                             ),
                     );
                   }),
             ),
-            FutureBuilder(
-                future: getData(),
-                builder: (context, snapShot) {
-                  return FutureBuilder(
-                      future: onTap(),
-                      builder: (context, snapShot) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: _widthScale * 24.0),
-                          child:
-                              // if(output) output['user'][0]['_id'] != responsevv['_id']
-
-                              Container(
-                            color: backgroundColor,
-                            // color: Colors.yellow,
-                            width: double.infinity,
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  print(
-                                      "phone is${output['user'][0]["phone"]}");
-                                  print(
-                                      "phone isssssss${output['user'][0]["available"]}");
-                                  if (output['user'][0]["available"] ==
-                                      "false") {
-                                    if (output['user'][0]['_id'] !=
-                                        responsevv['_id']) {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SlotBookTime(
-                                                    i: output['user'][0]
-                                                        ["phone"],
-                                                  )));
-                                    } else {
-                                      const snackBar = SnackBar(
-                                        content: Text(
-                                            "You cannot book slot to yourself"),
-                                        duration: Duration(milliseconds: 2000),
-                                        backgroundColor: text6,
-                                      );
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar);
-                                    }
-                                  } else if (output['user'][0]["available"] ==
-                                      "true") {
-                                    const snackBar = SnackBar(
-                                      content: Text(
-                                          "The Professional you choose is not available ! Please choose another"),
-                                      duration: Duration(milliseconds: 2000),
-                                      backgroundColor: text6,
-                                    );
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: text6,
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Book Slot',
-                                  style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18)),
-                                )),
-                            // Row(
-                            //   children: [
-                            //     // spacehort,
-                            //     Column(
-                            //       children: [
-                            //         SizedBox(
-                            //           height: _heightScale * 28,
-                            //         ),
-                            //         Row(
-                            //           children: [
-                            //             spacehort,
-                            //             Text(
-                            //               "Book a session for",
-                            //               style: GoogleFonts.poppins(
-                            //                 fontSize: _widthScale * 15,
-                            //                 color: text6,
-                            //               ),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //         SizedBox(
-                            //           height: _heightScale * 1,
-                            //         ),
-                            //         Row(
-                            //           children: [
-                            //             // spacehort,
-                            //             Text(
-                            //               "Rs 999/-",
-                            //               style: GoogleFonts.poppins(
-                            //                   fontSize: _widthScale * 16,
-                            //                   color: text6,
-                            //                   fontWeight: FontWeight.w600),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //         SizedBox(
-                            //           height: _heightScale * 5,
-                            //         ),
-                            //       ],
-                            //     ),
-                            //     // spacehort1,
-                            //     SizedBox(
-                            //       width: _widthScale * 107.5,
-                            //     ),
-                            //     ElevatedButton(
-                            //         onPressed: () {
-                            //           Navigator.push(
-                            //               context,
-                            //               MaterialPageRoute(
-                            //                   builder: (context) => SlotBookTime(
-                            //                         i: output[0]["phone"],
-                            //                       )));
-                            //         },
-                            //         style: ElevatedButton.styleFrom(
-                            //           primary: text6,
-                            //           shape: new RoundedRectangleBorder(
-                            //             borderRadius:
-                            //                 new BorderRadius.circular(_widthScale * 10.0),
-                            //           ),
-                            //         ),
-                            //         child: Padding(
-                            //           padding:
-                            //               EdgeInsets.symmetric(vertical: _heightScale * 14),
-                            //           child: Text(
-                            //             'Book Now',
-                            //             style: GoogleFonts.poppins(
-                            //               textStyle: TextStyle(
-                            //                   fontSize: _widthScale * 13,
-                            //                   fontWeight: FontWeight.bold),
-                            //             ),
-                            //           ),
-                            //         )),
-                            //     // SizedBox(
-                            //     //   width: 5,
-                            //     // ),
-                            //   ],
-                            // ),
-                          ),
-                        );
-                      });
-                }),
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FutureBuilder(
+          future: getData(),
+          builder: (context, snapShot) {
+            return FutureBuilder(
+                future: onTap(),
+                builder: (context, snapShot) {
+                  return Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: _widthScale * 24.0),
+                    child:
+                        // if(output) output['user'][0]['_id'] != responsevv['_id']
+
+                        Container(
+                      decoration: BoxDecoration(
+                          color: backgroundColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      // color: Colors.yellow,
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.07,
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            print("phone is${output['user'][0]["phone"]}");
+                            print(
+                                "phone isssssss${output['user'][0]["available"]}");
+                            if (output['user'][0]["available"] == "false") {
+                              if (output['user'][0]['_id'] !=
+                                  responsevv['_id']) {
+                                var fcmToken =
+                                    output['user'][0]['fcmtoken'].toString();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SlotBookTime(
+                                            i: output['user'][0]["phone"],
+                                            fcm: fcmToken)));
+                              } else {
+                                const snackBar = SnackBar(
+                                  content: Text(
+                                      "You cannot Book Session to yourself"),
+                                  duration: Duration(milliseconds: 2000),
+                                  backgroundColor: text6,
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
+                            } else if (output['user'][0]["available"] ==
+                                "true") {
+                              const snackBar = SnackBar(
+                                content: Text(
+                                    "The Professional you choose is not available ! Please choose another"),
+                                duration: Duration(milliseconds: 2000),
+                                backgroundColor: text6,
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            elevation: 8,
+                            primary: text6,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Book Session',
+                            style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18)),
+                          )),
+                    ),
+                  );
+                });
+          }),
     );
   }
 
@@ -1096,8 +1038,10 @@ class _UserProfileState extends State<UserProfile> {
             children: [
               Column(
                 children: [
-                  Text(getCapitalizeStringaa(subtitle),
-                      style: GoogleFonts.poppins(fontSize: _widthScale * 12)),
+                  FittedBox(
+                    child: Text(getCapitalizeStringaa(subtitle),
+                        style: GoogleFonts.poppins(fontSize: _widthScale * 12)),
+                  ),
                   // SizedBox(
                   //   height: 8,
                   // ),
@@ -1117,132 +1061,133 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Widget box2(String img, String name, String role, String img2,
-      String university, String img3) {
+      String university, String img3, String id) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
     double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
 
-    return Column(
-      children: [
-        Container(
-          // color: Colors.black,
-          height: _heightScale * 250,
-          width: _widthScale * 200,
-          child: Column(
-            children: [
-              SizedBox(
-                height: _heightScale * 32.5,
-              ),
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  output['user'][0]['anonymous'] == "false"
-                      ? output['user'][0]['profilePic'] != ""
-                          ? Container(
-                              height: _heightScale * 90,
-                              width: _widthScale * 90,
-                              decoration: BoxDecoration(
-                                  color: white(context).withOpacity(0.39),
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: NetworkImage(
-                                        output['user'][0]['profilePic'],
-                                      ),
-                                      fit: BoxFit.cover)),
-                            )
-                          : (output['user'][0]['gender'] == "Male" ||
-                                  output['user'][0]['gender'] == "Other")
-                              ? Image.asset(
-                                  'assets/Men Professional.png',
-                                  height: _heightScale * 90,
-                                  width: _widthScale * 90,
-                                )
-                              : Image.asset(
-                                  'assets/Female Professional.png',
-                                  height: _heightScale * 90,
-                                  width: _widthScale * 90,
-                                )
-                      : (output['user'][0]['gender'] == "Male" ||
-                              output['user'][0]['gender'] == "Other")
-                          ? Image.asset(
-                              'assets/Men Professional.png',
-                              height: _heightScale * 90,
-                              width: _widthScale * 90,
-                            )
-                          : Image.asset(
-                              'assets/Female Professional.png',
-                              height: _heightScale * 90,
-                              width: _widthScale * 90,
-                            ),
-                  output['user'][0]['verified'] == 'true'
+    return Padding(
+      padding: const EdgeInsets.only(left: 40.0),
+      child: Column(
+        children: [
+          output['user'][0]['anonymous'] == "false"
+              ? output['user'][0]['profilePic'] != ""
+                  ? Container(
+                      height: _heightScale * 90,
+                      width: _widthScale * 90,
+                      decoration: BoxDecoration(
+                          color: white(context).withOpacity(0.39),
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                output['user'][0]['profilePic'],
+                              ),
+                              fit: BoxFit.cover)),
+                    )
+                  : (output['user'][0]['gender'] == "Male" ||
+                          output['user'][0]['gender'] == "Other")
                       ? Image.asset(
-                          "assets/verify.png",
-                          height: _heightScale * 25,
-                          color: Colors.green,
-                          width: _widthScale * 25,
+                          'assets/Men Professional.png',
+                          height: _heightScale * 90,
+                          width: _widthScale * 90,
                         )
-                      : SizedBox(height: 0),
-                ],
-              ),
-              SizedBox(
-                height: _heightScale * 21,
-              ),
-              Text(
-                  getCapitalizeStringaa(output['user'][0]['anonymous'] == "true"
-                      ? "Anonymoys"
-                      : name),
-                  style: GoogleFonts.poppins(
-                    fontSize: _widthScale * 14,
-                    fontWeight: FontWeight.bold,
-                  )),
-              SizedBox(
-                height: _heightScale * 16,
-              ),
-              Text(getCapitalizeStringaa(role),
-                  style: GoogleFonts.poppins(
-                    fontSize: _widthScale * 12,
-                  )),
-              // SizedBox(
-              //   height: _heightScale * 16.71,
-              // ),
-              // Row(
-              //   // mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     SizedBox(
-              //       width: _widthScale * 50,
-              //     ),
-              //     Image.asset(
-              //       img2,
-              //       // color: blue,
-              //       height: _heightScale * 25,
-              //       width: _widthScale * 25,
-              //     ),
-              //     SizedBox(
-              //       width: _widthScale * 10,
-              //     ),
-              //     Text(university,
-              //         style: GoogleFonts.poppins(
-              //           fontSize: _widthScale * 12,
-              //         )),
-              //   ],
-              // ),
-              SizedBox(
-                height: _heightScale * 16.2,
-              ),
-              Text(getCapitalizeStringaa(img3),
-                  style: GoogleFonts.poppins(
-                    fontSize: _widthScale * 12,
-                  )),
-              // Image.asset(
-              //   img3,
-              //   height: _heightScale * 30,
-              //   width: _widthScale * 107,
-              // ),
-            ],
+                      : Image.asset(
+                          'assets/Female Professional.png',
+                          height: _heightScale * 90,
+                          width: _widthScale * 90,
+                        )
+              : (output['user'][0]['gender'] == "Male" ||
+                      output['user'][0]['gender'] == "Other")
+                  ? Image.asset(
+                      'assets/Men Professional.png',
+                      height: _heightScale * 90,
+                      width: _widthScale * 90,
+                    )
+                  : Image.asset(
+                      'assets/Female Professional.png',
+                      height: _heightScale * 90,
+                      width: _widthScale * 90,
+                    ),
+          output['user'][0]['verified'] == 'true'
+              ? Image.asset(
+                  "assets/verify.png",
+                  height: _heightScale * 25,
+                  color: Colors.green,
+                  width: _widthScale * 25,
+                )
+              : SizedBox(height: 0),
+          SizedBox(
+            height: _heightScale * 21,
           ),
-        ),
-      ],
+          Text(
+              getCapitalizeStringaa(output['user'][0]['anonymous'] == "true"
+                  ? "Anonymoys"
+                  : name),
+              style: GoogleFonts.poppins(
+                fontSize: _widthScale * 14,
+                fontWeight: FontWeight.bold,
+              )),
+          Text(
+              getCapitalizeStringaa("Rating : " +
+                  "${output['user'][0]['rating'].toString()[0]}" +
+                  "/5"),
+              style: GoogleFonts.poppins(
+                fontSize: _widthScale * 10,
+                fontWeight: FontWeight.w400,
+              )),
+          Text(getCapitalizeStringaa(id),
+              style: GoogleFonts.poppins(
+                fontSize: _widthScale * 10,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              )),
+
+          SizedBox(
+            height: _heightScale * 16,
+          ),
+          Text(getCapitalizeStringaa(role),
+              style: GoogleFonts.poppins(
+                fontSize: _widthScale * 12,
+              )),
+          // SizedBox(
+          //   height: _heightScale * 16.71,
+          // ),
+          // Row(
+          //   // mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     SizedBox(
+          //       width: _widthScale * 50,
+          //     ),
+          //     Image.asset(
+          //       img2,
+          //       // color: blue,
+          //       height: _heightScale * 25,
+          //       width: _widthScale * 25,
+          //     ),
+          //     SizedBox(
+          //       width: _widthScale * 10,
+          //     ),
+          //     Text(university,
+          //         style: GoogleFonts.poppins(
+          //           fontSize: _widthScale * 12,
+          //         )),
+          //   ],
+          // ),
+          SizedBox(
+            height: _heightScale * 16.2,
+          ),
+          Text(getCapitalizeStringaa(img3),
+              style: GoogleFonts.poppins(
+                fontSize: _widthScale * 12,
+              )),
+          // Image.asset(
+          //   img3,
+          //   height: _heightScale * 30,
+          //   width: _widthScale * 107,
+          // ),
+        ],
+      ),
     );
   }
 

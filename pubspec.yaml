@@ -55,6 +55,11 @@ dependencies:
   modal_bottom_sheet: ^2.0.0
   # adaptive_theme:
   adaptive_theme: ^2.3.0
+  share_plus: ^3.1.0
+  multi_select_flutter: ^4.0.0
+  hexcolor: ^2.0.6
+  url_launcher: ^6.0.20
+  flutter_rating_bar: ^4.0.0
 
 
 dev_dependencies:

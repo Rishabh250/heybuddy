@@ -1,4 +1,5 @@
 // import 'dart:html';
+// import 'dart:html';
 
 import 'dart:developer';
 
@@ -11,11 +12,13 @@ import 'package:heybuddy/api/api_profile.dart';
 import 'package:heybuddy/api/professional_choice.dart';
 import 'package:heybuddy/api/refund_api.dart';
 import 'package:heybuddy/api/second_tab_api.dart';
+import 'package:heybuddy/api/send_noti/send_noti.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/api/unique_calendar.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/widgets/custom_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfessionalAppointmentSchedule extends StatefulWidget {
   // const AppointmentBooked({Key? key}) : super(key: key);
@@ -55,9 +58,24 @@ class _ProfessionalAppointmentScheduleState
     return refund;
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   var add = TimeOfDay.minutesPerHour / 2;
   String getText() {
     if (time == null) {
+      print("RDS : " + output['userFCM'].toString());
       return 'Select Time';
     } else {
       fhour = time;
@@ -68,25 +86,25 @@ class _ProfessionalAppointmentScheduleState
       // final extratime = TimeOfDay(hour: hours, minute: minutes);
       if (minutes < 10) {
         print('1');
-        return '$hours:${0}${minutes} - $hours:${minutes + 30}';
+        return '$hours:${0}$minutes - $hours:${minutes + 30}';
       } else if (hours < 10 && minutes >= 30) {
         print('22');
-        return '${0}$hours:${minutes} -  ${0}${hours + 1}:${0}${minutes + 30 - 60} ';
+        return '${0}$hours:$minutes -  ${0}${hours + 1}:${0}${minutes + 30 - 60} ';
       } else if (hours < 10) {
         print('2');
-        return '${0}$hours:${minutes} - ${0}$hours:${minutes + 30} ';
+        return '${0}$hours:$minutes - ${0}$hours:${minutes + 30} ';
       } else if (hours > 10 && minutes >= 40) {
         print('3');
-        return '$hours:${minutes} - ${hours + 1}:${minutes + 30 - 60} ';
+        return '$hours:$minutes - ${hours + 1}:${minutes + 30 - 60} ';
       } else if (hours > 10 && minutes >= 30) {
         print('3');
-        return '$hours:${minutes} - ${hours + 1}:${0}${minutes + 30 - 60} ';
+        return '$hours:$minutes - ${hours + 1}:${0}${minutes + 30 - 60} ';
       } else if (hours > 10 && minutes < 30) {
         print('333');
-        return '$hours:${minutes} - ${hours}:${minutes + 30} ';
+        return '$hours:$minutes - $hours:${minutes + 30} ';
       } else if (hours > 10) {
         print('32');
-        return '$hours:${minutes} - ${hours + 1}:${00}${minutes + 30 - 60}';
+        return '$hours:$minutes - ${hours + 1}:${00}${minutes + 30 - 60}';
       } else if (minutes > 10 && minutes < 30) {
         print('4');
         return '$hours:$minutes - $hours:${minutes + 30}';
@@ -141,13 +159,13 @@ class _ProfessionalAppointmentScheduleState
       final minutes = time.minute;
       // final extratime = TimeOfDay(hour: hours, minute: minutes);
       if (minutes < 10 && hours < 10) {
-        return '${0}$hours:${0}${minutes}';
+        return '${0}$hours:${0}$minutes';
       } else if (minutes < 10) {
-        return '$hours:${0}${minutes}';
+        return '$hours:${0}$minutes';
       } else if (hours < 10) {
-        return '${0}$hours:${minutes}';
+        return '${0}$hours:$minutes';
       } else if (hours >= 10) {
-        return '$hours:${minutes}';
+        return '$hours:$minutes';
       } else if (minutes > 10 && minutes < 30) {
         return '$hours:$minutes'; //'$hours:$minutes';
       } else if (minutes > 30) {
@@ -208,6 +226,10 @@ class _ProfessionalAppointmentScheduleState
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
       print("goins");
+      sendNoti(
+          output['userFCM'].toString(),
+          "Congratulationals! Professional has accepted your Booking ID : ${output['orderId']}\nPlease accept the proposed timing to confirm the booking",
+          output['skill']);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -228,94 +250,7 @@ class _ProfessionalAppointmentScheduleState
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       // Navigator.pop(context);
-    }
-    // else if (int.parse(output['Date']
-    //         .toString()
-    //         .replaceRange(10, 24, "")
-    //         .replaceRange(0, 9, "")) ==
-    //     DateTime.now().day.toInt()) {
-    //   print("going 11");
-    //   if (int.parse(todaytimehour
-    //           .toString()
-    //           .toString()
-    //           .replaceRange(0, 10, "")
-    //           .replaceRange(2, 6, "")) >
-    //       int.parse(fhour
-    //           .toString()
-    //           .replaceRange(0, 10, "")
-    //           .replaceRange(2, 6, ""))) {
-    //     const snackBar = SnackBar(
-    //       content: Text("Choose Future Time"),
-    //       duration: Duration(milliseconds: 2000),
-    //       backgroundColor: text6,
-    //     );
-    //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    //   } else {
-    //     setState(() {
-    //       approve = 'yes';
-    //     });
-    //     submit();
-    //     Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: (context) => Nav1(
-    //                   selectedIndex: 1,
-    //                 )));
-    //     // Navigator.pop(context);
-    //   }
-    // } else if (int.parse(output['Date']
-    //         .toString()
-    //         .replaceRange(10, 24, "")
-    //         .replaceRange(0, 9, "")) !=
-    //     DateTime.now().day.toInt()) {
-    //   print("going 22");
-    //   if (int.parse(DateTime.now()
-    //               .toString()
-    //               .replaceRange(6, 25, "")
-    //               .replaceRange(0, 5, "")) -
-    //           int.parse(output['Date']
-    //               .toString()
-    //               .replaceRange(7, 24, "")
-    //               .replaceRange(0, 5, "")) <=
-    //       0) {
-    //     if (int.parse(DateTime.now()
-    //                 .toString()
-    //                 .replaceRange(9, 25, "")
-    //                 .replaceRange(0, 8, "")) -
-    //             int.parse(output['Date']
-    //                 .toString()
-    //                 .replaceRange(10, 24, "")
-    //                 .replaceRange(0, 8, "")) <=
-    //         0) {
-    //       setState(() {
-    //         approve = 'yes';
-    //       });
-    //       submit();
-    //       Navigator.pushReplacement(
-    //           context,
-    //           MaterialPageRoute(
-    //               builder: (context) => Nav1(
-    //                     selectedIndex: 1,
-    //                   )));
-    //     } else {
-    //       const snackBar = SnackBar(
-    //         content: Text("Event Expired"),
-    //         duration: Duration(milliseconds: 2000),
-    //         backgroundColor: text6,
-    //       );
-    //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    //     }
-    //   } else {
-    //     const snackBar = SnackBar(
-    //       content: Text("Event Expired !"),
-    //       duration: Duration(milliseconds: 2000),
-    //       backgroundColor: text6,
-    //     );
-    //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    //   }
-
-    // }
-    else {
+    } else {
       setState(() {
         approve = 'yes';
       });
@@ -330,7 +265,7 @@ class _ProfessionalAppointmentScheduleState
     }
   }
 
-  onCanclesend() {
+  onCanclesend() async {
     //  else if (_cont.text.isNotEmpty) {
     setState(() {
       approve = 'no';
@@ -391,8 +326,8 @@ class _ProfessionalAppointmentScheduleState
                               child: Text(
                                 "Cancel",
                                 style: GoogleFonts.poppins(
-                                  textStyle:
-                                      TextStyle(fontSize: 16, color: white(context)),
+                                  textStyle: TextStyle(
+                                      fontSize: 16, color: white(context)),
                                 ),
                               ))),
                       SizedBox(
@@ -417,8 +352,8 @@ class _ProfessionalAppointmentScheduleState
                               child: Text(
                                 "Proceed",
                                 style: GoogleFonts.poppins(
-                                  textStyle:
-                                      TextStyle(fontSize: 16, color: white(context)),
+                                  textStyle: TextStyle(
+                                      fontSize: 16, color: white(context)),
                                 ),
                               ))),
                       SizedBox(
@@ -539,11 +474,11 @@ class _ProfessionalAppointmentScheduleState
             content: SingleChildScrollView(
               child: Container(
                 // color: backgroundColor,
-                height: _heightScale * 400,
+                height: MediaQuery.of(context).size.height * 0.44,
                 child: Column(
                   children: [
                     SizedBox(
-                      height: _heightScale * 30,
+                      height: _heightScale * 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -571,9 +506,14 @@ class _ProfessionalAppointmentScheduleState
                             fontSize: _widthScale * 15.0,
                             color: black(context)),
                         decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           filled: true,
                           fillColor: white(context).withOpacity(0.5),
-                          hintText: 'typing',
+                          hintText: 'Enter cancellation reason',
                           hintStyle: GoogleFonts.poppins(
                               textStyle: TextStyle(fontSize: _widthScale * 16)),
                           contentPadding: EdgeInsets.only(
@@ -582,23 +522,21 @@ class _ProfessionalAppointmentScheduleState
                               top: _heightScale * 8.0),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: textFieldColor(context),
+                              width: 2,
+                              color: Colors.black,
                             ),
-                            borderRadius:
-                                BorderRadius.circular(_widthScale * 6),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: textFieldColor(context),
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(_widthScale * 6),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(
-                      height: _heightScale * 40,
+                      height: _heightScale * 20,
                     ),
                     Container(
                       height: _heightScale * 56,
@@ -672,8 +610,10 @@ class _ProfessionalAppointmentScheduleState
     Widget spacevert1 = SizedBox(
       height: size.height * 0.03,
     );
+    bool isLoading = false;
+
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: white(context).withOpacity(0.6), //backgroundColor,
         elevation: 0,
@@ -700,6 +640,23 @@ class _ProfessionalAppointmentScheduleState
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                var date = output['Date'].split('-');
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                var finalDate =
+                    getDate + " " + months[mon - 1] + ', ' + date[0];
                 return Column(
                   children: [
                     output == null
@@ -725,28 +682,34 @@ class _ProfessionalAppointmentScheduleState
                                       "Booking id:  ",
                                       output['orderId'] == ""
                                           ? ""
-                                          : output['orderId']
-                                              .toString()
-                                              .replaceRange(0, 6, ""),
+                                          : output['orderId'],
                                       text9),
                                   SizedBox(
                                     height: _heightScale * 32,
                                   ),
                                   Appointment(
-                                      "Topic: ",
-                                      output['topic'] == ""
+                                      "Skill: ",
+                                      output['skill'] == ""
                                           ? ""
-                                          : output['topic'],
+                                          : output['skill']
+                                              .toString()
+                                              .toUpperCase(),
                                       text9),
                                   SizedBox(
                                     height: _heightScale * 32,
                                   ),
                                   Appointment(
-                                      "Name: ",
-                                      output['professionalname'] != null
-                                          ? getCapitalizeStringaa(
-                                              output['aspirantname'])
-                                          : "No Detail",
+                                      "Aspirant Name: ",
+                                      output['isAspirantAnonymous'] == "true"
+                                          ? "Anonymous"
+                                          : output['aspirantname'] != null
+                                              ? getCapitalizeStringaa(
+                                                  output['aspirantname'])
+                                              : "No Detail",
+                                      // : output['professionalname'] != null
+                                      //     ? getCapitalizeStringaa(
+                                      //         output['aspirantname'])
+                                      //     : "No Detail",
                                       text9),
                                   SizedBox(
                                     height: _heightScale * 32,
@@ -763,11 +726,7 @@ class _ProfessionalAppointmentScheduleState
                                   ),
                                   Appointment(
                                       "Date:  ",
-                                      output['Date'] == ""
-                                          ? ""
-                                          : output['Date']
-                                              .toString()
-                                              .replaceRange(10, 24, ""),
+                                      output['Date'] == "" ? "" : finalDate,
                                       text9),
                                   SizedBox(
                                     height: _heightScale * 32,

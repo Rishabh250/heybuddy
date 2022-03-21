@@ -1,23 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:heybuddy/Screens/login_signinphone.dart';
 import 'package:heybuddy/Screens/logoName.dart';
 import 'package:heybuddy/Screens/onboarding_Screen.dart';
-import 'package:heybuddy/Screens/resetpasswordemail_Screen.dart';
-import 'package:heybuddy/api/profileget_api.dart';
 import 'package:heybuddy/api/resetpassword.dart';
-import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/color&font/textStyle.dart';
-import 'package:heybuddy/main.dart';
-import 'package:heybuddy/shared_preference/innercheck_shared_preference.dart';
-import 'package:heybuddy/shared_preference/shared_preference.dart';
-import 'package:heybuddy/shared_preference/shared_preference_login.dart';
-import 'package:heybuddy/shared_preference/upercheck_sharedpreference.dart';
-import 'package:heybuddy/shared_preference/user.dart';
-import 'package:heybuddy/widgets/custom_bar.dart';
-import 'package:provider/provider.dart';
 
 class EnterConfirmPassword extends StatefulWidget {
   var email;

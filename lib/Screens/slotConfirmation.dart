@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/mypayments.dart';
 import 'package:heybuddy/api/api_payment.dart';
 import 'package:heybuddy/api/api_profile.dart';
+import 'package:heybuddy/api/send_noti/send_noti.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/api/unique_user.dart';
 import 'package:heybuddy/api/verify_payment.dart';
@@ -11,6 +12,7 @@ import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/provider/styles.dart';
 import 'package:heybuddy/widgets/custom_bar.dart';
 import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
 
 class SlotConfirm extends StatefulWidget {
@@ -18,11 +20,15 @@ class SlotConfirm extends StatefulWidget {
   var topics;
   var date;
   var lang;
+  var price;
+  String fcmToken;
   SlotConfirm(
       {required this.i,
       required this.topics,
       required this.date,
-      required this.lang});
+      required this.lang,
+      required this.fcmToken,
+      required this.price});
   // const SlotConfirm({Key? key}) : super(key: key);
   // var date;
   // SlotConfirm(@required this.date);
@@ -72,7 +78,9 @@ class _SlotConfirmState extends State<SlotConfirm> {
         response['phone'],
         output['user'][0]['phone'],
         widget.topics,
-        1, //widget.lang=="General Conversation"?1:1,
+        widget.lang == "general conversation"
+            ? widget.price
+            : widget.price, //widget.lang=="General Conversation"?1:1,
         widget.date,
         widget.lang);
     return result;
@@ -100,6 +108,9 @@ class _SlotConfirmState extends State<SlotConfirm> {
       "restrictAppInvoke": restrictAppInvoke,
       "enableAssist": enableAssist
     };
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("fcmToken", widget.fcmToken);
+
     print('kk$sendMap');
     try {
       var responses = AllInOneSdk.startTransaction(
@@ -118,6 +129,11 @@ class _SlotConfirmState extends State<SlotConfirm> {
         // Navigator.pop(context);
         // Navigator.push(
         //     context, MaterialPageRoute(builder: (context) => MyPayments()));
+
+        sendNoti(
+            widget.fcmToken,
+            "You have recevied a request for session for ${widget.topics}\nOrder ID : $o\nPlease Respond",
+            widget.topics);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -199,7 +215,7 @@ class _SlotConfirmState extends State<SlotConfirm> {
           ),
         ),
         title: Text(
-          "Book Slot",
+          "Book Session",
           style: GoogleFonts.poppins(
               color: black(context),
               fontSize: _widthScale * 18,
@@ -211,6 +227,14 @@ class _SlotConfirmState extends State<SlotConfirm> {
         child: FutureBuilder(
             future: onTap(),
             builder: (context, snapShot) {
+              if (snapShot.connectionState == ConnectionState.waiting) {
+                return Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
               return SingleChildScrollView(
                 child: output == null
                     ? Container(
@@ -310,9 +334,11 @@ class _SlotConfirmState extends State<SlotConfirm> {
                                   ),
                                   data(
                                       "Professional's Name:",
-                                      output['user'][0]['name'] == ''
-                                          ? "Not Known"
-                                          : output['user'][0]['name']),
+                                      output['user'][0]['anonymous'] == "true"
+                                          ? "Anonymous"
+                                          : output['user'][0]['name'] == ''
+                                              ? "Not Known"
+                                              : output['user'][0]['name']),
                                   SizedBox(
                                     height: _heightScale * 35,
                                   ),
@@ -320,7 +346,7 @@ class _SlotConfirmState extends State<SlotConfirm> {
                                   SizedBox(
                                     height: _heightScale * 32,
                                   ),
-                                  data("Conversation Topics:", widget.topics),
+                                  data("Session Notes:", widget.topics),
                                   SizedBox(
                                     height: _heightScale * 32,
                                   ),
@@ -370,9 +396,7 @@ class _SlotConfirmState extends State<SlotConfirm> {
                                       width: _widthScale * 129,
                                     ),
                                     Text(
-                                      widget.lang == "general conversation"
-                                          ? "Rs 249/-"
-                                          : "Rs 999/-",
+                                      "Rs ${widget.price}/-",
                                       style: GoogleFonts.poppins(
                                           fontSize: _widthScale * 18,
                                           fontWeight: FontWeight.bold),
@@ -395,19 +419,25 @@ class _SlotConfirmState extends State<SlotConfirm> {
                                         // Navigator.push(context,
                                         //     MaterialPageRoute(builder: (context) => SlotConfirm()));
                                         var resd = await onResult();
-                                        print(resd['txnToken']);
-                                        print(resd['mid']);
-                                        print(resd['orderId']);
+                                        print("RRRRRRRRRRRRRRRRRR" +
+                                            "${resd['txnToken']}");
+                                        print(
+                                            "RRRRRRRRRRRRRRRRRR ${resd['mid']}");
+                                        print("RRRRRRRRRRRRRRRRRR" +
+                                            "${resd['orderId']}");
 
                                         await _startTransaction(
                                             resd['txnToken'],
                                             resd['mid'],
                                             resd['orderId']);
-                                        setState(() {
-                                          isLoading1 = false;
-                                        });
+                                        if (mounted) {
+                                          setState(() {
+                                            isLoading1 = false;
+                                          });
+                                        }
                                       },
                                       style: ElevatedButton.styleFrom(
+                                        elevation: 8,
                                         primary: isLoading1
                                             ? text6.withOpacity(0.4)
                                             : text6,
@@ -499,12 +529,33 @@ class _SlotConfirmState extends State<SlotConfirm> {
         ));
   }
 
-  Widget data(String title, String title2) {
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  Widget data(String title, String date) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
     double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
+    var getdate = date.split('-');
+    // var mon = int.parse(date[1]);
+    // var getDate0 = date[2][0];
+    // var getDate1 = date[2][1];
+    // var getDate = getDate0 + getDate1;
 
+    // var finalDate = getDate + " " + months[mon - 1] + ', ' + date[0];
+    print("EEEEEErrrr" + "$getdate");
     return Column(
       children: [
         Row(
@@ -524,7 +575,7 @@ class _SlotConfirmState extends State<SlotConfirm> {
           children: [
             // SizedBox(width: MediaQuery.of(context).size.width * 0.1),
             Text(
-              title2,
+              date,
               style: GoogleFonts.poppins(
                 fontSize: _widthScale * 16,
               ),

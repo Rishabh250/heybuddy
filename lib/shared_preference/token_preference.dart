@@ -9,11 +9,11 @@ class TokenPreference {
 
   setTokenPreferenceData(var data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   
+
     prefs.setString(_USER_DATA, data);
   }
 
-   getTokenPreferenceData() async {
+  getTokenPreferenceData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     dynamic data;
     try {

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:heybuddy/Screens/homePage.dart';
 import 'package:heybuddy/Screens/setting.dart';
 import 'package:heybuddy/api/signup_api.dart';
 import 'package:heybuddy/api/upi.dart';
 import 'package:heybuddy/color&font/colors.dart';
+
+import '../widgets/custom_bar.dart';
 
 class BankDetails extends StatefulWidget {
   // const BankDetails({Key? key}) : super(key: key);
@@ -41,7 +46,17 @@ class _BankDetailsState extends State<BankDetails> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
       output = await Upi.choice(_cont.text, tkn);
-      Navigator.pop(context);
+      EasyLoading.dismiss();
+      Get.snackbar("UPI ID has been added successfully", "",
+          backgroundColor: Colors.black,
+          icon: Icon(Icons.done_all, color: Colors.white),
+          snackPosition: SnackPosition.BOTTOM,
+          colorText: Colors.white,
+          borderRadius: 30,
+          margin: EdgeInsets.all(8));
+      Get.to(() => Nav1(
+            selectedIndex: 0,
+          ));
       // Navigator.pushReplacement(
       //     context, MaterialPageRoute(builder: (context) => Setting()));
     }
@@ -89,6 +104,7 @@ class _BankDetailsState extends State<BankDetails> {
               padding: EdgeInsets.only(right: _widthScale * 10.0),
               child: TextButton(
                 onPressed: () {
+                  EasyLoading.show();
                   id();
                 },
                 child: Text(

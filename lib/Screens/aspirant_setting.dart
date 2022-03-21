@@ -81,9 +81,11 @@ class _AspirantSettingState extends State<AspirantSetting> {
         isSwitch1 = true;
       });
     } else if (anon == "false") {
-      setState(() {
-        isSwitch1 = false;
-      });
+      if (mounted) {
+        setState(() {
+          isSwitch1 = false;
+        });
+      }
     }
     // isSwitch1 = anon;
     print("dpppppp$isSwitch1");
@@ -143,7 +145,7 @@ class _AspirantSettingState extends State<AspirantSetting> {
                           width: _widthScale * 15,
                         ),
                         Icon(
-                          Icons.person_add_disabled,
+                          Icons.dark_mode,
                           color: text6,
                         ),
                         SizedBox(

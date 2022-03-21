@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as https;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/ddddddd.dart';
 import 'package:heybuddy/Screens/edit_bio.dart';
@@ -11,6 +14,8 @@ import 'package:heybuddy/Screens/seeall_professional.dart';
 import 'package:heybuddy/Screens/seeall_skills_profonly.dart';
 import 'package:heybuddy/Screens/skills_new_experience.dart';
 import 'package:heybuddy/api/api_profile.dart';
+import 'package:heybuddy/api/payout.dart';
+import 'package:heybuddy/api/send_noti/send_noti.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/provider/styles.dart';
@@ -27,9 +32,10 @@ class ProfessionalUserProfile extends StatefulWidget {
 }
 
 class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
+  String verifyProgress = "";
+  var payout;
   @override
   void initState() {
-    // TODO: implement initState
     _onRefresh();
     getData();
     // getgh();
@@ -43,6 +49,8 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
   // List pp = [];
   getData() async {
     response = await getdata(tkn);
+    print("object");
+    print(response);
     // pp = response;
     return response;
     // setState(() {
@@ -180,40 +188,14 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                 children: [
                                   // spacehort,
                                   Column(
-                                    children: [
-                                      // SizedBox(
-                                      //   height: _heightScale * 24,
-                                      //   // width: size.width * 0.96,
-                                      // ),
-                                      // GestureDetector(
-                                      //     onTap: () {
-                                      //       Scaffold.of(context).openDrawer();
-                                      //     },
-                                      //     child:
-                                      //  Container(
-                                      //   // color: Colors.yellow,
-                                      //   height: _heightScale * 30,
-                                      //   width: _widthScale * 35,
-                                      //   child:
-                                      //  Center(
-                                      //   child: GestureDetector(
-                                      //     onTap: () {
-                                      //       Scaffold.of(context)
-                                      //           .openDrawer();
-                                      //     },
-                                      //     child: Image.asset(
-                                      //       "assets/Vector.png",
-                                      //       height: _heightScale * 16.85,
-                                      //       width: _widthScale * 18,
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // )),
-                                    ],
+                                    children: [],
                                   ),
                                   // SizedBox(width: _widthScale * 15),
                                   Container(
-                                    color: white(context).withOpacity(0.39),
+                                    decoration: BoxDecoration(
+                                        color: white(context),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
                                     // color: Colors.red,
                                     child: Column(
                                       children: [
@@ -260,30 +242,34 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                                 future: getgh(),
                                                 builder: (context, snapshot) {
                                                   return box2(
-                                                    // "assets/Ellipse 9.png",
-                                                    response != null
-                                                        ? response['name']
-                                                        : '',
-                                                    // "Sr Technical Program Manager",
-                                                    z.isEmpty
-                                                        ? "Not Mentioned Yet"
-                                                        : response['company'][0]
-                                                            ['title'],
-                                                    // "",
-                                                    "assets/Education.png",
-                                                    // "University Of HartFort",
-                                                    // response['university'] != ""
-                                                    //     ? response['university']
-                                                    //     :
-                                                    'No Educational details',
-                                                    // "assets/Rectangle 704.png",
-                                                    z.isEmpty
-                                                        ? "Not Mentioned Yet"
-                                                        : response['company'][0]
-                                                            ['company_name'],
-                                                    // response['company']==[]?"": response['company'][0]
-                                                    // ['company_name'],
-                                                  );
+                                                      // "assets/Ellipse 9.png",
+                                                      response != null
+                                                          ? response['name']
+                                                          : '',
+                                                      // "Sr Technical Program Manager",
+                                                      z.isEmpty
+                                                          ? "Not Mentioned Yet"
+                                                          : response['company']
+                                                              [0]['title'],
+                                                      // "",
+                                                      "assets/Education.png",
+                                                      // "University Of HartFort",
+                                                      // response['university'] != ""
+                                                      //     ? response['university']
+                                                      //     :
+                                                      'No Educational details',
+                                                      // "assets/Rectangle 704.png",
+                                                      z.isEmpty
+                                                          ? "Not Mentioned Yet"
+                                                          : response['company']
+                                                                  [0]
+                                                              ['company_name'],
+                                                      response != null
+                                                          ? response['HKTID']
+                                                          : ''
+                                                      // response['company']==[]?"": response['company'][0]
+                                                      // ['company_name'],
+                                                      );
                                                 }),
                                           ],
                                         ),
@@ -311,7 +297,42 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                         bottom: _heightScale * 15),
                                     child: //bioname(FontWeight.bold)
                                         Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Account Details :",
+                                              style: GoogleFonts.poppins(
+                                                  fontSize: _widthScale * 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: black(context)),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          "E-Mail : " + response['email'],
+                                          textAlign: TextAlign.left,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: _widthScale * 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Phone Number : " + response['phone'],
+                                          textAlign: TextAlign.left,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: _widthScale * 14,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
                                         Row(
                                           children: [
                                             Text(
@@ -329,6 +350,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                               response['bio'] != null
                                                   ? response['bio']
                                                   : "Add Your Bio"),
+                                          textAlign: TextAlign.left,
                                           style: GoogleFonts.poppins(
                                             fontSize: _widthScale * 14,
                                           ),
@@ -522,6 +544,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                         top: _heightScale * 0.0),
                                     child: Text("Professional History",
                                         style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
                                             fontSize: _widthScale * 18,
                                             color:
                                                 Styles.isDark ? text6 : text5)),
@@ -548,13 +571,14 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                   return FutureBuilder(
                                       future: getgh(),
                                       builder: (context, snapShot) {
+                                        print("EEEEEE" + "${z.length}");
                                         return z.isEmpty
                                             ? Container(
                                                 height: _heightScale * 80,
                                                 width: double.infinity,
                                                 child: Center(
                                                   child: Text(
-                                                    "Add Your Professional Experience ",
+                                                    "No professional history added, please add",
                                                     style: GoogleFonts.poppins(
                                                         fontSize:
                                                             _widthScale * 14,
@@ -608,7 +632,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                             Container(
                               width: double.infinity,
                               color: white(context).withOpacity(0.39),
-                              margin: EdgeInsets.only(top: _heightScale * 20),
+                              margin: EdgeInsets.only(top: _heightScale * 5),
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: _heightScale * 10.0,
@@ -636,7 +660,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                           // color: Colors.yellow,
                                           child: Center(
                                             child: Text(
-                                              "See All",
+                                              "See All ($y)",
                                               style: GoogleFonts.poppins(
                                                   fontSize: _widthScale * 14,
                                                   color: text6),
@@ -677,7 +701,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                               ),
                             ),
                             SizedBox(
-                              height: _heightScale * 25,
+                              height: _heightScale * 5,
                             ),
                             Container(
                               color: white(context).withOpacity(0.39),
@@ -687,30 +711,65 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                     vertical: _heightScale * 10),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Payout Ratio : ",
-                                          style: GoogleFonts.poppins(
-                                              fontSize: _widthScale * 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: black(context)),
-                                        ),
-                                        Text(
-                                          "${response['percentage']}" + " %",
-                                          style: GoogleFonts.poppins(
-                                              fontSize: _widthScale * 14,
-                                              color: black(context)),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      "Pay-Out Ratio will be calculated based on your total professional summary",
-                                      style: GoogleFonts.poppins(
-                                          fontSize: _widthScale * 14,
-                                          // fontWeight: FontWeight.bold,
-                                          color: black(context)),
-                                    ),
+                                    FutureBuilder(
+                                        future: payOut(tkn),
+                                        builder:
+                                            (context, AsyncSnapshot snapShot) {
+                                          if (snapShot.hasData) {
+                                            var data = snapShot.requireData;
+                                            print("RTCSF :" +
+                                                data.commission.toString());
+                                            payout = data.commission;
+                                            return Row(
+                                              children: [
+                                                Text(
+                                                  "Payout Ratio : ${data.commission}%",
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize:
+                                                          _widthScale * 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: black(context)),
+                                                ),
+                                                Spacer(),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AlertDialog(
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          _widthScale *
+                                                                              12),
+                                                            ),
+                                                            title: Text(
+                                                              "Pay Out ratio is the commision that you earn for taking bookings. Pay-out ratio is automatically calculated based on your professional history and years of experience.",
+                                                              style: GoogleFonts
+                                                                  .poppins(
+                                                                textStyle: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: black(
+                                                                        context)),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        });
+                                                  },
+                                                  child: Image.asset(
+                                                    "assets/i.png",
+                                                    height: 20,
+                                                  ),
+                                                )
+                                              ],
+                                            );
+                                          }
+                                          return Container();
+                                        }),
                                   ],
                                 ),
                               ),
@@ -729,6 +788,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                         top: _heightScale * 0.0),
                                     child: Text("Education",
                                         style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
                                             fontSize: _widthScale * 18,
                                             color:
                                                 Styles.isDark ? text6 : text5)),
@@ -807,7 +867,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                             Container(
                               width: double.infinity,
                               color: white(context).withOpacity(0.39),
-                              margin: EdgeInsets.only(top: _heightScale * 20),
+                              margin: EdgeInsets.only(top: _heightScale * 5),
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: _heightScale * 10.0,
@@ -834,7 +894,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                             // color: Colors.yellow,
                                             child: Center(
                                               child: Text(
-                                                "See All",
+                                                "See All ($yy)",
                                                 style: GoogleFonts.poppins(
                                                     fontSize: _widthScale * 14,
                                                     color: text6),
@@ -887,12 +947,12 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                   Padding(
                                     padding: EdgeInsets.only(
                                         top: _heightScale * 0.0),
-                                    child: Text("Skills Known",
+                                    child: Text("Skills",
                                         style: GoogleFonts.poppins(
                                             fontSize: _widthScale * 18,
                                             color:
                                                 Styles.isDark ? text6 : text5,
-                                            fontWeight: FontWeight.w500)),
+                                            fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               ),
@@ -986,7 +1046,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                             Container(
                               width: double.infinity,
                               color: white(context).withOpacity(0.39),
-                              margin: EdgeInsets.only(top: _heightScale * 20),
+                              margin: EdgeInsets.only(top: _heightScale * 5),
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     top: _heightScale * 10.0,
@@ -1013,7 +1073,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                                             // color: Colors.yellow,
                                             child: Center(
                                               child: Text(
-                                                "See All",
+                                                "See All ($x)",
                                                 style: GoogleFonts.poppins(
                                                     fontSize: _widthScale * 14,
                                                     color: text6),
@@ -1057,6 +1117,33 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                             SizedBox(
                               height: _heightScale * 25,
                             ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: _heightScale * 0.0, left: 20),
+                                  child: Text("Verification Status : ",
+                                      style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: _widthScale * 18,
+                                          color:
+                                              Styles.isDark ? text6 : text5)),
+                                ),
+                                response["verificationRequested"] == "false"
+                                    ? InkWell(
+                                        onTap: () {
+                                          sendVerify(tkn);
+                                        },
+                                        child: Container(
+                                          child:
+                                              Text("Send Verification Request"),
+                                        ),
+                                      )
+                                    : Text(response["verificationRequested"]
+                                        .toString()
+                                        .toUpperCase()),
+                              ],
+                            )
                           ],
                         ),
                 );
@@ -1314,7 +1401,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
   }
 
   Widget box2(String name, String role, String img2, String university,
-      String company) {
+      String company, String id) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
@@ -1344,6 +1431,11 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                     fontSize: _widthScale * 14,
                     fontWeight: FontWeight.bold,
                   )),
+
+              Text(getCapitalizeStringaa(id),
+                  style: GoogleFonts.poppins(
+                    fontSize: _widthScale * 12,
+                  )),
               SizedBox(
                 height: _heightScale * 15.2,
               ),
@@ -1351,30 +1443,7 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
                   style: GoogleFonts.poppins(
                     fontSize: _widthScale * 12,
                   )),
-              // SizedBox(
-              //   height: _heightScale * 15.2,
-              // ),
-              // Row(
-              //   // mainAxisAlignment: MainAxisAlignment.,
-              //   children: [
-              //     SizedBox(
-              //       width: _widthScale * 60,
-              //     ),
-              //     Image.asset(
-              //       img2,
-              //       // color: blue,
-              //       height: _heightScale * 25,
-              //       width: _widthScale * 25,
-              //     ),
-              //     SizedBox(
-              //       width: _widthScale * 10,
-              //     ),
-              //     Text(university,
-              //         style: GoogleFonts.poppins(
-              //           fontSize: _widthScale * 12,
-              //         )),
-              //   ],
-              // ),
+
               SizedBox(
                 height: _heightScale * 15.2,
               ),
@@ -1401,5 +1470,32 @@ class _ProfessionalUserProfileState extends State<ProfessionalUserProfile> {
       style: GoogleFonts.poppins(
           fontSize: 14, fontWeight: FontWeight.bold, color: text11),
     );
+  }
+
+  sendVerify(tkn) async {
+    try {
+      var response = await https.get(
+          Uri.parse(
+              'https://heybuddybackend.herokuapp.com/api/user/verificationRequested'),
+          headers: {"x-access-token": "$tkn"});
+
+      var result = json.decode(response.body) as Map<String, dynamic>;
+
+      setState(() {
+        verifyProgress =
+            json.decode(response.body)["professional"]["verificationRequested"];
+      });
+
+      print('RRRRRRRRRRRRRRRRRRtt : $verifyProgress');
+
+      if (response.statusCode == 200) {
+        return verifyProgress;
+      } else if (response.statusCode == 400) {
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("RRRRRRRRRRRRRRRRRR" + e.toString());
+    }
   }
 }

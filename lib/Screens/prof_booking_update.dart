@@ -51,6 +51,20 @@ class _ProfessionalsBookingUpdateState
     return '${str[0].toUpperCase()}${str.substring(1)}';
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   @override
   Widget build(BuildContext context) {
     const double kDesignWidth = 375;
@@ -90,7 +104,7 @@ class _ProfessionalsBookingUpdateState
           ),
         ),
         title: Text(
-          "Appointment",
+          "Session Detail",
           style: GoogleFonts.poppins(
               color: whitebox(context),
               fontSize: _widthScale * 18,
@@ -103,6 +117,75 @@ class _ProfessionalsBookingUpdateState
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                var time = output['meetingTime'];
+                time = time.split(':');
+                var hours = int.parse(time[0]);
+                if (hours > 12) {
+                  if (hours == 13) {
+                    hours = 1;
+                  }
+                  if (hours == 14) {
+                    hours = 2;
+                  }
+                  if (hours == 15) {
+                    hours = 3;
+                  }
+                  if (hours == 16) {
+                    hours = 4;
+                  }
+                  if (hours == 17) {
+                    hours = 5;
+                  }
+                  if (hours == 18) {
+                    hours = 6;
+                  }
+                  if (hours == 19) {
+                    hours = 7;
+                  }
+                  if (hours == 20) {
+                    hours = 8;
+                  }
+                  if (hours == 21) {
+                    hours = 9;
+                  }
+                  if (hours == 22) {
+                    hours = 10;
+                  }
+                  if (hours == 23) {
+                    hours = 11;
+                  }
+                  if (hours == 24) {
+                    hours = 0;
+                  }
+                }
+                var noon;
+                if (int.parse(time[0]) > 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) == 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) < 12) {
+                  noon = "AM";
+                }
+
+                var finalTime = hours.toString() + ":" + time[1] + " " + noon;
+                var date = output['Date'].split('-');
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                var finalDate =
+                    getDate + " " + months[mon - 1] + ', ' + date[0];
                 return output == null
                     ? Container(
                         height: _heightScale * 650,
@@ -119,12 +202,7 @@ class _ProfessionalsBookingUpdateState
                           SizedBox(
                             height: _heightScale * 32,
                           ),
-                          Appointment(
-                              "Booking id: ",
-                              output['orderId']
-                                  .toString()
-                                  .replaceRange(0, 6, ""),
-                              text9),
+                          Appointment("Booking id: ", output['orderId'], text9),
                           SizedBox(
                             height: _heightScale * 32,
                           ),
@@ -138,11 +216,17 @@ class _ProfessionalsBookingUpdateState
                             height: _heightScale * 32,
                           ),
                           Appointment(
-                              "Name: ",
-                              output['professionalname'] != null
-                                  ? getCapitalizeStringaa(
-                                      output['aspirantname'])
-                                  : "No Detail",
+                              "Aspirant Name: ",
+                              output['isAspirantAnonymous'] == "true"
+                                  ? "Anonymous"
+                                  : output['aspirantname'] != null
+                                      ? getCapitalizeStringaa(
+                                          output['aspirantname'])
+                                      : "No Detail",
+                              // : output['professionalname'] != null
+                              //     ? getCapitalizeStringaa(
+                              //         output['aspirantname'])
+                              //     : "No Detail",
                               text9),
                           SizedBox(
                             height: _heightScale * 32,
@@ -187,9 +271,7 @@ class _ProfessionalsBookingUpdateState
                                           //   width: MediaQuery.of(context).size.width * 0.08,
                                           // ),
                                           Text(
-                                            output['Date']
-                                                .toString()
-                                                .replaceRange(10, 24, ""),
+                                            finalDate,
                                             style: GoogleFonts.poppins(
                                               fontSize: _widthScale * 12,
                                               color: black(context),
@@ -207,60 +289,6 @@ class _ProfessionalsBookingUpdateState
                                       SizedBox(
                                         height: _heightScale * 10,
                                       ),
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: _widthScale * 10,
-                                          ),
-                                          // SizedBox(
-                                          //   width: MediaQuery.of(context).size.width * 0.08,
-                                          // ),
-                                          Text(
-                                            "2022-01-25",
-                                            // resout[widget.index]['Date']
-                                            //     .toString()
-                                            //     .replaceRange(10, 24, ""),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: _widthScale * 12,
-                                              color: black(context),
-                                              // fontWeight: FontWeight.w600
-                                            ),
-                                          ),
-                                          Text(
-                                            " - ${output['approvedbyprofessional']}",
-                                            style: GoogleFonts.poppins(
-                                                fontSize: _widthScale * 12,
-                                                color: black(context)),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: _heightScale * 10,
-                                      ),
-                                      // Row(
-                                      //   children: [
-                                      //     SizedBox(
-                                      //       width: _widthScale * 10,
-                                      //     ),
-                                      //     // SizedBox(
-                                      //     //   width: MediaQuery.of(context).size.width * 0.08,
-                                      //     // ),
-                                      //     Text(
-                                      //       "2022-01-25",
-                                      //       style: GoogleFonts.poppins(
-                                      //         fontSize: _widthScale * 12,
-                                      //         color: black(context),
-                                      //         // fontWeight: FontWeight.w600
-                                      //       ),
-                                      //     ),
-                                      //     Text(
-                                      //       " - ${output['approvedbyaspirant']}",
-                                      //       style: GoogleFonts.poppins(
-                                      //           fontSize: _widthScale * 12,
-                                      //           color: black(context)),
-                                      //     ),
-                                      //   ],
-                                      // ),
                                     ],
                                   ),
                                 )
@@ -268,12 +296,11 @@ class _ProfessionalsBookingUpdateState
                           SizedBox(
                             height: _heightScale * 32,
                           ),
-                          Appointment(
-                              "Date: ",
-                              output['Date']
-                                  .toString()
-                                  .replaceRange(10, 24, ""),
-                              text9),
+                          Appointment("Date: ", finalDate, text9),
+                          SizedBox(
+                            height: _heightScale * 32,
+                          ),
+                          Appointment("Time: ", finalTime, text9),
                           SizedBox(
                             height: _heightScale * 32,
                           ),

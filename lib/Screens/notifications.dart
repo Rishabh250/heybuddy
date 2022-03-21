@@ -1,10 +1,22 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:heybuddy/Screens/profess_appointment_schedule.dart';
+import 'package:heybuddy/Screens/professional_meeting_completed.dart';
+import 'package:heybuddy/Screens/professionalappointment_booked.dart';
 import 'package:heybuddy/api/notifications.dart';
 import 'package:heybuddy/api/signup_api.dart';
 import 'package:heybuddy/color&font/colors.dart';
 import 'package:heybuddy/color&font/textStyle.dart';
 import 'package:heybuddy/provider/styles.dart';
+import 'package:heybuddy/widgets/app_drawer.dart';
+import 'package:heybuddy/widgets/custom_bar.dart';
+
+import 'aspirant_appointment_schedule.dart';
+import 'aspirant_booked.dart';
+import 'aspirant_booking_update.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -30,6 +42,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return notification;
   }
 
+  var finalDate;
   var x;
   getgf() async {
     print("output is $notification");
@@ -38,6 +51,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
     return x;
   }
 
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   var imggg = "https://identix.state.gov/qotw/images/no-photo.gif";
   @override
   Widget build(BuildContext context) {
@@ -167,14 +194,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                           notification != null
                                               ? notification['data'][index]
                                                   ['title']
-                                              : "Not Data",
+                                              : notification != null
+                                                  ? notification['data'][index]
+                                                      ['title']
+                                                  : "Not Data",
                                           notification != null
                                               ? notification['data'][index]
                                                       ['Date']
                                                   .toString()
                                                   .replaceRange(10, 24, "")
                                               : "Not Data",
+
                                           index,
+                                          notification['data'][index]['_id'],
                                         );
                                       }),
                                 );
@@ -207,112 +239,206 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
   }
 
-  Widget topics(String img, String title, String subtitle, int i) {
+  Widget topics(
+      String img, String title, String subtitle, int i, String getId) {
     const double kDesignWidth = 375;
     const double kDesignHeight = 812;
     double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
     double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
+    var date = subtitle.split('-');
+    var mon = int.parse(date[1]);
+    var getOrderID = title.split(' ');
 
+    finalDate = date[2] + " " + months[mon - 1] + ', ' + date[0];
     return Column(
       children: [
-        ListTile(
-          leading: ClipRRect(
-              borderRadius:
-                  BorderRadius.all(Radius.circular(_widthScale * 5.0)),
-              child: Padding(
-                padding: EdgeInsets.only(left: _widthScale * 10.0),
-                child: notification['data'][i]['profilePic'] != ""
-                    ? Container(
-                        height: _heightScale * 60,
-                        width: _widthScale * 60,
-                        decoration: BoxDecoration(
-                            color: white(context).withOpacity(0.39),
-                            // border: Border.all()
-                            shape: BoxShape.circle,
-                            image: //res[i]['profilePic'] == ""
-                                // DecorationImage(image: NetworkImage(imggg))
-                                DecorationImage(
-                                    image: NetworkImage(
-                                      notification['data'][i]['profilePic'],
-                                    ),
-                                    fit: BoxFit.cover)),
-                      )
-                    : (notification['data'][i]['gender'] == "Male" ||
-                            notification['data'][i]['gender'] == "Other")
-                        ? Image.asset(
-                            'assets/Men Professional.png',
-                            height: _heightScale * 70,
-                            width: _widthScale * 70,
-                          )
-                        : Image.asset(
-                            'assets/Female Professional.png',
-                            height: _heightScale * 70,
-                            width: _widthScale * 70,
-                          ),
+        GestureDetector(
+          onTap: () {
+            print('REREWQR' + getOrderID.toString());
+            if (getOrderID[7].contains("HTKG") &&
+                title.toString().contains(
+                    "Congratulations! Your professional has accepted your booking")) {
+              print("REREWQR" + "${getOrderID[7]}");
 
-                //  Container(
-                //   height: _heightScale * 60,
-                //   width: _widthScale * 60,
-                //   decoration: BoxDecoration(
-                //       color: white.withOpacity(0.39),
-                //       // border: Border.all()
-                //       shape: BoxShape.circle,
-                //       image: //res[i]['profilePic'] == ""
-                //           // DecorationImage(image: NetworkImage(imggg))
-                //           DecorationImage(
-                //               image: NetworkImage(
-                //                 img,
-                //               ),
-                //               fit: BoxFit.cover)),
-                // ),
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          AspirantAppointmentSchedule(index: getOrderID)));
+              return;
+              // Get.to(() => Nav1(selectedIndex: 1));
+            }
+            if (getOrderID[6].contains("HTKG") &&
+                title.toString().contains(
+                    "Congratulations! aspirant has accepted your booking")) {
+              print("REREWQR" + "${getOrderID[6]}");
 
-                // Image.asset(
-                //   img,
-                //   height: _heightScale * 50,
-                //   width: _widthScale * 50,
-                //   fit: BoxFit.fill,
-                //   //scale: 10,
-                // ),
-              )),
-          title: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: _heightScale * 12.0),
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                      fontSize: _widthScale * 12,
-                      color: Styles.isDark ? whites.withOpacity(0.8) : text9),
-                ),
-              ),
-              SizedBox(
-                height: _widthScale * 8,
-              ),
-            ],
-          ),
-          subtitle: Row(
-            children: [
-              Column(
-                children: [
-                  Text(
-                    subtitle,
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfessionalAppointmentBooked(
+                            index: getOrderID,
+                            getId: getId,
+                          )));
+              return;
+              // Get.to(() => Nav1(selectedIndex: 1));
+            }
+            if (getOrderID[6].contains("HTKG") &&
+                title
+                    .toString()
+                    .contains("Great! You have accepted the booking")) {
+              print("REREWQR" + "${getOrderID[7]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AspirantAppointmentBooked(
+                            index: getOrderID,
+                            getId: getId,
+                          )));
+              return;
+              // Get.to(() => Nav1(selectedIndex: 1));
+            }
+
+            if (getOrderID[16].contains("HTKG") &&
+                title.toString().contains("Hi")) {
+              print("REREWQR" + "${getOrderID[16]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ProfessionalAppointmentSchedule(index: getOrderID)));
+              return;
+              // Get.to(() => Nav1(selectedIndex: 1));
+            }
+            if (getOrderID[7].contains("HTKG") &&
+                getOrderID[0].contains("Congratulations")) {
+              print("REREWQR" + "${getOrderID[7]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfessionalAppointmentBooked(
+                            index: getOrderID,
+                            getId: getId,
+                          )));
+            }
+            if (getOrderID[7].contains("HTKG") &&
+                title.toString().contains(
+                      "Great, your payment is received",
+                    )) {
+              print("REREWQR" + "${getOrderID[7]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AspirantBookingUpdate(
+                            index: getOrderID,
+                          )));
+            }
+            if (getOrderID[6].contains("HTKG") &&
+                title.toString().contains(
+                      "Great!, you have accepted the booking",
+                    )) {
+              print("REREWQR" + "${getOrderID[6]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AspirantBookingUpdate(
+                            index: getOrderID,
+                          )));
+            }
+            if (getOrderID[6].contains("HTKG") &&
+                getOrderID[0].contains("Congratulations")) {
+              print("REREWQR" + "${getOrderID[6]}");
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfessionalAppointmentBooked(
+                            index: getOrderID[6],
+                            getId: getId,
+                          )));
+              // Get.to(() => Nav1(selectedIndex: 1));
+            }
+          },
+          child: ListTile(
+            leading: ClipRRect(
+                borderRadius:
+                    BorderRadius.all(Radius.circular(_widthScale * 5.0)),
+                child: Padding(
+                  padding: EdgeInsets.only(left: _widthScale * 10.0),
+                  child: notification['data'][i]['profilePic'] != ""
+                      ? Container(
+                          height: _heightScale * 60,
+                          width: _widthScale * 60,
+                          decoration: BoxDecoration(
+                              color: white(context).withOpacity(0.39),
+                              // border: Border.all()
+                              shape: BoxShape.circle,
+                              image: //res[i]['profilePic'] == ""
+                                  // DecorationImage(image: NetworkImage(imggg))
+                                  DecorationImage(
+                                      image: NetworkImage(
+                                        notification['data'][i]['profilePic'],
+                                      ),
+                                      fit: BoxFit.cover)),
+                        )
+                      : (notification['data'][i]['gender'] == "Male" ||
+                              notification['data'][i]['gender'] == "Other")
+                          ? Image.asset(
+                              'assets/Men Professional.png',
+                              height: _heightScale * 70,
+                              width: _widthScale * 70,
+                            )
+                          : Image.asset(
+                              'assets/Female Professional.png',
+                              height: _heightScale * 70,
+                              width: _widthScale * 70,
+                            ),
+                )),
+            title: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: _heightScale * 12.0),
+                  child: Text(
+                    title,
                     style: GoogleFonts.poppins(
                         fontSize: _widthScale * 12,
-                        color:
-                            Styles.isDark ? whites.withOpacity(0.8) : text10),
+                        color: Styles.isDark ? whites.withOpacity(0.8) : text9),
                   ),
-                  // SizedBox(
-                  //   height: 8,
-                  // ),
-                  // Row(
-                  //   children: [
-                  //     Text("2018-2022",
-                  //         style: GoogleFonts.poppins(fontSize: 12, color: text10)),
-                  //   ],
-                  // ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(
+                  height: _widthScale * 8,
+                ),
+              ],
+            ),
+            subtitle: Row(
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      finalDate,
+                      style: GoogleFonts.poppins(
+                          fontSize: _widthScale * 12,
+                          color:
+                              Styles.isDark ? whites.withOpacity(0.8) : text10),
+                    ),
+                    // SizedBox(
+                    //   height: 8,
+                    // ),
+                    // Row(g
+                    //   children: [g
+                    //     Text("2018-2022",g
+                    //         style: GoogleFonts.poppings(fontSize: 12, color: text10)),
+                    //   ],
+                    // ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -325,5 +451,57 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
       ],
     );
+  }
+}
+
+class LocalNotificationService {
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  static void initialize(BuildContext context) {
+    // initializationSettings  for Android
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+    );
+
+    _notificationsPlugin.initialize(
+      initializationSettings,
+      onSelectNotification: (String? id) async {
+        print("onSelectNotification");
+        if (id!.isNotEmpty) {
+          print("Router Value1234 $id");
+
+          Get.to(Nav1(selectedIndex: 2));
+        }
+      },
+    );
+  }
+
+  static void createanddisplaynotification(RemoteMessage message) async {
+    try {
+      final id = DateTime.now().millisecondsSinceEpoch;
+
+      NotificationDetails notificationDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
+          "noti",
+          "pushnotificationapp",
+          "pushnotificationappchannel",
+          importance: Importance.max,
+          priority: Priority.high,
+          ongoing: true,
+          playSound: true,
+        ),
+      );
+
+      await _notificationsPlugin.show(
+        id,
+        message.notification!.title,
+        message.notification!.body,
+        notificationDetails,
+        payload: message.data['_id'],
+      );
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 }

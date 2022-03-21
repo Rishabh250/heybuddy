@@ -1,16 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/slotConfirmation.dart';
+import 'package:http/http.dart' as http;
 import 'package:heybuddy/api/getProfessionalUsers.dart';
 import 'package:heybuddy/api/unique_user.dart';
 import 'package:heybuddy/color&font/colors.dart';
-import 'package:heybuddy/color&font/textStyle.dart';
 import 'package:heybuddy/widgets/custom_drop_down_button.dart';
 import 'package:intl/intl.dart';
+import '../api/email_verification.dart';
+import '../provider/styles.dart';
 
 class SlotBookTime extends StatefulWidget {
   var i;
-  SlotBookTime({required this.i});
+  String fcm;
+  SlotBookTime({required this.i, required this.fcm});
   // const SlotBookTime({Key? key}) : super(key: key);
 
   @override
@@ -18,17 +24,16 @@ class SlotBookTime extends StatefulWidget {
 }
 
 class _SlotBookTimeState extends State<SlotBookTime> {
+  var tkn = datam.read('f');
+  String price = "";
   TextEditingController _topics = TextEditingController();
   var pickedDate;
   var newDate;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // getUsers(1);
     pickedDate = DateTime.now();
     onTap();
-    // getgf();
     getText();
   }
 
@@ -66,13 +71,15 @@ class _SlotBookTimeState extends State<SlotBookTime> {
       ffff = DateFormat('dd').format(pickedDate);
       ffff1 = DateFormat('MM').format(pickedDate);
       ffff2 = DateFormat('yyyy').format(pickedDate);
-      print("today isf ${ffff}");
-      print("today isf1 ${ffff1}");
-      print("today isf2 ${ffff2}");
-      print("today is date ${todaydate}");
-      print("today is month ${todaymonth}");
-      print("today is year ${todayyear}");
+      print("today isf $ffff");
+      print("today isf1 $ffff1");
+      print("today isf2 $ffff2");
+      print("today is date $todaydate");
+      print("today is month $todaymonth");
+      print("today is year $todayyear");
+
       return DateFormat('MM-dd-yyyy').format(pickedDate);
+
       // return '${date.month}/${date.day}/${date.year}';
     }
   }
@@ -80,27 +87,24 @@ class _SlotBookTimeState extends State<SlotBookTime> {
   var output;
   onTap() async {
     output = await UniqueUser.uniqueUser(widget.i);
+    getBookingPrice(output['user'][0]['_id'], _value);
+
     return output;
   }
 
   var x;
+  var x2;
   getgf() async {
-    print("output is $output");
     x = List.generate(
         output['user'][0]["skills"] != null
             ? output['user'][0]["skills"].length
             : 0,
         (index) => output['user'][0]["skills"][index]['name']);
-    print("output x is$x");
+
     return x;
   }
 
   var _value = "general conversation";
-  onChange(var xx) {
-    setState(() {
-      _value = xx;
-    });
-  }
 
   String getCapitalizeStringaa(String str) {
     if (str.length <= 1) {
@@ -128,6 +132,26 @@ class _SlotBookTimeState extends State<SlotBookTime> {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: GestureDetector(
+          onTap: (() {
+            Get.back();
+          }),
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Styles.isDark ? text7 : Colors.black,
+          ),
+        ),
+        title: Text(
+          "Book Session",
+          style: TextStyle(
+              color: Styles.isDark ? text7 : Colors.black,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
       // backgroundColor: backgroundColor,
       body: FutureBuilder(
           future: onTap(),
@@ -137,61 +161,16 @@ class _SlotBookTimeState extends State<SlotBookTime> {
                 padding: EdgeInsets.symmetric(horizontal: _widthScale * 24),
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: _heightScale * 35,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Image.asset("assets/Vector.png"),
-                        // SizedBox(
-                        //   width: _widthScale * 115,
-                        // ),
-                        Image.asset(
-                          "assets/logohort1.png",
-                          height: _heightScale * 36.74,
-                          width: _widthScale * 112,
-                        ),
-                        // Container(
-                        //   height: _heightScale * 35,
-                        //   width: _widthScale * 35,
-                        //   decoration: BoxDecoration(
-                        //     borderRadius:
-                        //         BorderRadius.all(Radius.circular(_widthScale * 20)),
-                        //     color: black(context),
-                        //     //  shape: BoxShape.circle
-                        //   ),
-                        //   child: Padding(
-                        //     padding: EdgeInsets.only(
-                        //         left: _widthScale * 8, top: _heightScale * 9),
-                        //     child: Text(
-                        //       "HB",
-                        //       style: GoogleFonts.poppins(
-                        //           textStyle: TextStyle(
-                        //               color: white,
-                        //               fontSize: _widthScale * 12,
-                        //               fontWeight: FontWeight.bold)),
-                        //     ),
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   width: _widthScale * 15,
-                        // ),
-                        // Text(
-                        //   "HeyBuddy",
-                        //   style: CustomTextStyle.HeyBuddy1(context),
-                        // ),
-                      ],
-                    ),
-                    SizedBox(height: _heightScale * 53),
+                    SizedBox(height: _heightScale * 20),
                     fields("Add topics to discuss"),
-                    SizedBox(height: _heightScale * 32),
+                    SizedBox(height: _heightScale * 10),
                     Row(
                       children: [
                         Text(
                           "Select Skills for Discussion",
-                          style:
-                              GoogleFonts.poppins(fontSize: _widthScale * 16),
+                          style: GoogleFonts.poppins(
+                              fontSize: _widthScale * 16,
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -201,31 +180,37 @@ class _SlotBookTimeState extends State<SlotBookTime> {
                         future: getgf(),
                         builder: (context, snapShot) {
                           return Container(
-                              child:
-                                  // res[widget.i]["skills"] == []
-                                  //     ? Container(
-                                  //         child: Text("NO SKILLS"),
-                                  //       )
-                                  //     :
-                                  CustomDropDownButton(
-                                      widthScale: 20,
-                                      hintText: //res[widget.i]["skills"] != null
-                                          "General conversation",
-                                      items: x != null ? x : [], //getgf(),
-                                      onChange: onChange,
-                                      value: _value));
+                              child: CustomDropDownButton(
+                                  widthScale: 20,
+                                  hintText: //res[widget.i]["skills"] != null
+                                      "General Conversation",
+                                  items: x != null ? x : [], //getgf(),
+                                  onChange: (var xx) {
+                                    print("object: " +
+                                        output['user'][0]['_id'].toString());
+
+                                    {
+                                      setState(() {
+                                        _value = xx;
+                                      });
+                                    }
+                                    getBookingPrice(
+                                        output['user'][0]['_id'], _value);
+                                  },
+                                  value: _value));
                         }),
-                    SizedBox(height: _heightScale * 32),
+                    SizedBox(height: _heightScale * 15),
                     Row(
                       children: [
                         Text(
                           "Select Date",
-                          style:
-                              GoogleFonts.poppins(fontSize: _widthScale * 16),
+                          style: GoogleFonts.poppins(
+                              fontSize: _widthScale * 16,
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                    SizedBox(height: _heightScale * 16),
+                    SizedBox(height: _heightScale * 12),
                     Container(
                       //margin: EdgeInsets.only(left: 20, right: 20),
                       height: _heightScale * 56,
@@ -244,76 +229,79 @@ class _SlotBookTimeState extends State<SlotBookTime> {
                         // title: Text("${pickedDate.year},${pickedDate!.month},${pickedDate!.day}"),
                         trailing: InkWell(
                             onTap: () => pickDate(context),
-                            child: Image.asset("assets/Group 804.png")),
+                            child: Image.asset(
+                              "assets/Group 804.png",
+                              color: Colors.blue,
+                            )),
                       ),
                     ),
                     SizedBox(height: _heightScale * 16),
-                    fieldss(
-                        "Total Amount",
-                        _value == "general conversation"
-                            ? "Rs 249/-"
-                            : "Rs 999/-"),
+                    fieldss("Total Amount :", "Rs $price/-"),
                     SizedBox(
-                      height: _heightScale * 150,
-                    ),
-
-                    Container(
-                      height: _heightScale * 56,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            if (_topics.text.isEmpty) {
-                              print("today is ffff$ffff");
-                              print("today is today$todaydate");
-                              const snackBar = SnackBar(
-                                content: Text("Fill the topic First."),
-                                duration: Duration(milliseconds: 2000),
-                                backgroundColor: text6,
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            } else if (int.parse(ffff) < todaydate ||
-                                int.parse(ffff1) < todaymonth ||
-                                int.parse(ffff2) < todayyear) {
-                              print("today is ffff$ffff");
-                              print("today is today$todaydate");
-                              const snackBar = SnackBar(
-                                content: Text("Choose Future Date"),
-                                duration: Duration(milliseconds: 2000),
-                                backgroundColor: text6,
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SlotConfirm(
-                                            i: output['user'][0]["phone"],
-                                            topics: _topics.text.trim(),
-                                            date: getText(),
-                                            lang: _value,
-                                          )));
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: text6,
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: Text(
-                            'Book Slot',
-                            style: GoogleFonts.poppins(
-                                textStyle: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18)),
-                          )),
+                      height: _heightScale * 160,
                     ),
                   ],
                 ),
               ),
             );
           }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        height: _heightScale * 56,
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: ElevatedButton(
+            onPressed: () {
+              if (_topics.text.isEmpty) {
+                print("today is ffff$ffff");
+                print("today is today$todaydate");
+                const snackBar = SnackBar(
+                  content: Text("Fill the topic First."),
+                  duration: Duration(milliseconds: 2000),
+                  backgroundColor: text6,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else if (int.parse(ffff) < todaydate ||
+                  int.parse(ffff1) < todaymonth ||
+                  int.parse(ffff2) < todayyear) {
+                print("today is ffff$ffff");
+                print("today is today$todaydate");
+                const snackBar = SnackBar(
+                  content: Text("Choose Future Date"),
+                  duration: Duration(milliseconds: 2000),
+                  backgroundColor: text6,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else {
+                print("object" + _value);
+                print("object" +
+                    output['user'][0]["skills"][0]['price'].toString());
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SlotConfirm(
+                              i: output['user'][0]["phone"],
+                              topics: _topics.text.trim(),
+                              date: getText(),
+                              lang: _value,
+                              fcmToken: widget.fcm,
+                              price: int.parse(price),
+                            )));
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 8,
+              primary: text6,
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0),
+              ),
+            ),
+            child: Text(
+              'Book Session',
+              style: GoogleFonts.poppins(
+                  textStyle:
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            )),
+      ),
     );
   }
 
@@ -332,7 +320,8 @@ class _SlotBookTimeState extends State<SlotBookTime> {
           children: [
             Text(
               title,
-              style: GoogleFonts.poppins(fontSize: _widthScale * 16),
+              style: GoogleFonts.poppins(
+                  fontSize: _widthScale * 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -383,12 +372,27 @@ class _SlotBookTimeState extends State<SlotBookTime> {
     double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // SizedBox(
         //   height: 30,
-        // ),
+        // ),Tex Text(
+        Text(
+          "Session Notes*",
+          style: GoogleFonts.poppins(
+              fontSize: _widthScale * 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+            "Note : Mention only the points that you would like to discuss in this session",
+            style: GoogleFonts.poppins(
+                fontSize: _widthScale * 8, fontWeight: FontWeight.w300)),
         TextField(
           controller: _topics,
+          keyboardType: TextInputType.text,
           autofocus: false,
           minLines: 1,
           maxLines: 5,
@@ -424,31 +428,6 @@ class _SlotBookTimeState extends State<SlotBookTime> {
       ],
     );
   }
-  // Widget boxes() {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(left: 20.0, right: 10),
-  //     child: TextField(
-  //       autofocus: false,
-  //       style: TextStyle(fontSize: 15.0, color: black(context)),
-  //       decoration: InputDecoration(
-  //         filled: true,
-  //         fillColor: white.withOpacity(0.5),
-  //         hintText: 'Add Topic to discuss',
-  //         hintStyle: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 16)),
-  //         contentPadding:
-  //             const EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
-  //         focusedBorder: OutlineInputBorder(
-  //           borderSide: BorderSide(color: textFieldColor(context),
-  //           borderRadius: BorderRadius.circular(6),
-  //         ),
-  //         enabledBorder: UnderlineInputBorder(
-  //           borderSide: BorderSide(color: textFieldColor(context),
-  //           borderRadius: BorderRadius.circular(6),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget button(String time, Color col, Color col2) {
     return ElevatedButton(
@@ -466,5 +445,32 @@ class _SlotBookTimeState extends State<SlotBookTime> {
             style: GoogleFonts.poppins(fontSize: 14, color: col2),
           ),
         ));
+  }
+
+  getBookingPrice(String userID, lang) async {
+    try {
+      http.Response res = await http.post(
+          Uri.parse(
+              'https://heybuddybackend.herokuapp.com/api/user/getSkillPrice'),
+          headers: {
+            "x-access-token": tkn.toString(),
+          },
+          body: {
+            "id": userID.toString(),
+            "skill": "$lang"
+          });
+      print("resbody${json.decode(res.body)['price']}");
+
+      setState(() {
+        price = json.decode(res.body)['price'].toString();
+      });
+      if (res.statusCode == 200) {
+      } else {
+        print("rescode${res.statusCode}");
+        print("resbody${res.body}");
+      }
+    } catch (e) {
+      print("resbody${e.toString()}");
+    }
   }
 }

@@ -14,8 +14,11 @@ import 'package:heybuddy/api/second_tab_api.dart';
 import 'package:heybuddy/api/signup_api.dart';
 import 'package:heybuddy/api/unique_calendar.dart';
 import 'package:heybuddy/color&font/colors.dart';
+import 'package:heybuddy/provider/styles.dart';
 import 'package:heybuddy/widgets/custom_bar.dart';
 import 'package:provider/provider.dart';
+
+import '../api/send_noti/send_noti.dart';
 
 class AspirantAppointmentSchedule extends StatefulWidget {
   var index;
@@ -102,6 +105,8 @@ class _AspirantAppointmentScheduleState
     subout = AspirantChoice.choice(output['orderId'], approve, tkn);
   }
 
+  bool isLoading = false;
+
   var me;
   meet() {
     me = Meeting.meeting(output['orderId']);
@@ -151,8 +156,8 @@ class _AspirantAppointmentScheduleState
                               child: Text(
                                 "Cancel",
                                 style: GoogleFonts.poppins(
-                                  textStyle:
-                                      TextStyle(fontSize: 16, color: white(context)),
+                                  textStyle: TextStyle(
+                                      fontSize: 16, color: white(context)),
                                 ),
                               ))),
                       SizedBox(
@@ -175,8 +180,8 @@ class _AspirantAppointmentScheduleState
                               child: Text(
                                 "Proceed",
                                 style: GoogleFonts.poppins(
-                                  textStyle:
-                                      TextStyle(fontSize: 16, color: white(context)),
+                                  textStyle: TextStyle(
+                                      fontSize: 16, color: white(context)),
                                 ),
                               ))),
                       SizedBox(
@@ -230,8 +235,13 @@ class _AspirantAppointmentScheduleState
       // Navigator.pop(context);
     } else {
       setState(() {
+        sendNoti(
+            output['profFCM'].toString(),
+            "Congratulationals! aspirant has accepted your Booking ID : ${output['orderId']}\nYou will receive a meeting invite on your calender.",
+            output['skill']);
         approve = 'yes';
       });
+
       submit();
       meet();
       Navigator.pushReplacement(
@@ -240,9 +250,24 @@ class _AspirantAppointmentScheduleState
               builder: (context) => Nav1(
                     selectedIndex: 1,
                   )));
-      // Navigator.pop(context);
+      Navigator.pop(context);
     }
   }
+
+  List months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
 
   var output;
   onTap() async {
@@ -281,7 +306,7 @@ class _AspirantAppointmentScheduleState
       height: size.height * 0.03,
     );
     return Scaffold(
-      backgroundColor: backgroundColor,
+      // backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: white(context).withOpacity(0.6), //backgroundColor,
         elevation: 0,
@@ -309,6 +334,86 @@ class _AspirantAppointmentScheduleState
           child: FutureBuilder(
               future: onTap(),
               builder: (context, snapShot) {
+                if (snapShot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                var time = output["meetingTime"];
+
+                time = time.split(':');
+                var hours = int.parse(time[0]);
+                if (hours > 12) {
+                  if (hours == 13) {
+                    hours = 1;
+                  }
+                  if (hours == 14) {
+                    hours = 2;
+                  }
+                  if (hours == 15) {
+                    hours = 3;
+                  }
+                  if (hours == 16) {
+                    hours = 4;
+                  }
+                  if (hours == 17) {
+                    hours = 5;
+                  }
+                  if (hours == 18) {
+                    hours = 6;
+                  }
+                  if (hours == 19) {
+                    hours = 7;
+                  }
+                  if (hours == 20) {
+                    hours = 8;
+                  }
+                  if (hours == 21) {
+                    hours = 9;
+                  }
+                  if (hours == 22) {
+                    hours = 10;
+                  }
+                  if (hours == 23) {
+                    hours = 11;
+                  }
+                  if (hours == 24) {
+                    hours = 0;
+                  }
+                }
+                var noon;
+                if (int.parse(time[0]) > 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) == 12) {
+                  noon = "PM";
+                }
+                if (int.parse(time[0]) < 12) {
+                  noon = "AM";
+                }
+                var prodate2 = output['professionalResponseDate'].split('-');
+                var promon2 = int.parse(prodate2[1]);
+                var prodate = prodate2[2][0];
+                var progetDate12 = prodate2[2][1];
+                var progetDate2 = prodate + progetDate12;
+
+                var proFinalDate = progetDate2 +
+                    " " +
+                    months[promon2 - 1] +
+                    ', ' +
+                    prodate2[0];
+                var finalTime = hours.toString() + ":" + time[1] + " " + noon;
+                var date = output['Date'].split('-');
+
+                var mon = int.parse(date[1]);
+                var getDate0 = date[2][0];
+                var getDate1 = date[2][1];
+                var getDate = getDate0 + getDate1;
+
+                var finalDate =
+                    getDate + " " + months[mon - 1] + ', ' + date[0];
+
                 return output == null
                     ? Container(
                         height: _heightScale * 650,
@@ -326,11 +431,7 @@ class _AspirantAppointmentScheduleState
                                 Image.asset("assets/Group 246 (1).png"),
                                 spacevert1,
                                 Appointment(
-                                    "Booking id: ",
-                                    output['orderId']
-                                        .toString()
-                                        .replaceRange(0, 6, ""),
-                                    text9),
+                                    "Booking id: ", output['orderId'], text9),
                                 spacevert1,
                                 Appointment("Topic: ", output['topic'], text9),
                                 // spacevert1,
@@ -338,28 +439,124 @@ class _AspirantAppointmentScheduleState
                                 //     "Manipreet Mittapelli", text9),
                                 spacevert1,
                                 Appointment(
-                                    "Name: ",
-                                    output['professionalname'] != null
-                                        ? getCapitalizeStringaa(
-                                            output['professionalname'])
-                                        : "No Detail",
+                                    "Professional Name: ",
+                                    output['isAspirantAnonymous'] == "true"
+                                        ? "Anonymous"
+                                        : output['professionalname'] != null
+                                            ? getCapitalizeStringaa(
+                                                output['professionalname'])
+                                            : "No Detail",
+                                    // : output['professionalname'] != null
+                                    //     ? getCapitalizeStringaa(
+                                    //         output['aspirantname'])
+                                    //     : "No Detail",
                                     text9),
                                 // SizedBox(
                                 //   height: _heightScale * 32,
                                 // ),
                                 spacevert1,
-                                Appointment(
-                                    "Status: ",
-                                    "Action Required" // resout[widget.index]['status']
-                                    ,
-                                    Colors.red),
+                                Row(
+                                  children: [
+                                    Appointment(
+                                        "Status: ",
+                                        "Action Required" // resout[widget.index]['status']
+                                        ,
+                                        Colors.red),
+                                    Spacer(),
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isLoading = !isLoading;
+                                          });
+                                        },
+                                        child: Icon(isLoading
+                                            ? Icons.arrow_drop_down_sharp
+                                            : Icons.arrow_drop_up))
+                                  ],
+                                ),
+                                isLoading
+                                    ? Container(
+                                        width: double.infinity,
+                                        height: _heightScale * 100,
+                                        color: white(context).withOpacity(0.7),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: _heightScale * 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: _widthScale * 10,
+                                                ),
+                                                // SizedBox(
+                                                //   width: MediaQuery.of(context).size.width * 0.08,
+                                                // ),
+                                                Text(
+                                                  finalDate,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context),
+                                                    // fontWeight: FontWeight.w600
+                                                  ),
+                                                ),
+                                                Text(
+                                                  " : Confirmed",
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize:
+                                                          _widthScale * 12,
+                                                      color: black(context)),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: _heightScale * 15,
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: _widthScale * 10,
+                                                ),
+                                                Text(
+                                                  proFinalDate,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context),
+                                                    // fontWeight: FontWeight.w600
+                                                  ),
+                                                ),
+                                                Text(
+                                                  " : Professional Response : ",
+                                                  // resout[widget.index]['Date']
+                                                  //     .toString()
+                                                  //     .replaceRange(10, 24, ""),
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: _widthScale * 12,
+                                                    color: black(context),
+                                                    // fontWeight: FontWeight.w600
+                                                  ),
+                                                ),
+                                                Text(
+                                                  output['approvedbyprofessional']
+                                                      .toString()
+                                                      .toUpperCase(),
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize:
+                                                          _widthScale * 12,
+                                                      color: black(context)),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: _heightScale * 10,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : Container(),
+
                                 spacevert1,
-                                Appointment(
-                                    "Date: ",
-                                    output['Date']
-                                        .toString()
-                                        .replaceRange(10, 24, ""),
-                                    text9),
+                                Appointment("Date: ", finalDate, text9),
                                 spacevert,
                                 Row(
                                   children: [
@@ -368,6 +565,16 @@ class _AspirantAppointmentScheduleState
                                       " Time Slot",
                                       style: GoogleFonts.poppins(
                                           fontSize: _widthScale * 16,
+                                          color: Styles.isDark
+                                              ? Colors.white
+                                              : Colors.black),
+                                    ),
+                                    Text(
+                                      output['meetingTime'] == ""
+                                          ? "Awaiting for professional professional"
+                                          : "  " + finalTime,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: _widthScale * 18,
                                           color: text9),
                                     ),
                                   ],
@@ -375,20 +582,7 @@ class _AspirantAppointmentScheduleState
                                 SizedBox(
                                   height: _heightScale * 14,
                                 ),
-                                Row(
-                                  children: [
-                                    // spacehort2,
-                                    Text(
-                                      output['meetingTime'] == ""
-                                          ? "Awaiting for professional professional"
-                                          : "  " +
-                                              output['meetingTime'].toString(),
-                                      style: GoogleFonts.poppins(
-                                          fontSize: _widthScale * 18,
-                                          color: text9),
-                                    ),
-                                  ],
-                                ),
+
                                 // Container(
                                 //   margin: EdgeInsets.only(left: 16, right: 15),
                                 //   height: 56,
@@ -409,11 +603,15 @@ class _AspirantAppointmentScheduleState
                           Row(
                             children: [
                               // spacehort,
-                              Expanded(child: button("Cancel", white(context), text6)),
+                              Expanded(
+                                  child:
+                                      button("Cancel", white(context), text6)),
                               SizedBox(
                                 width: _widthScale * 15,
                               ),
-                              Expanded(child: button("Accept", text6, white(context))),
+                              Expanded(
+                                  child:
+                                      button("Accept", text6, white(context))),
                               // spacehort,
                             ],
                           ),

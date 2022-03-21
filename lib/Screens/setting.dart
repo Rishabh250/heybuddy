@@ -1,5 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heybuddy/Screens/bank_details.dart';
 import 'package:heybuddy/api/anonymous.dart';
@@ -77,13 +79,20 @@ class _SettingState extends State<Setting> {
     anon = await getanonymous(tkn);
     print("vvvvvvv$anon");
     if (anon == "true") {
-      setState(() {
-        isSwitch1 = true;
-      });
+      if (mounted) {
+        setState(() {
+          isSwitch1 = true;
+          EasyLoading.dismiss();
+        });
+      }
     } else if (anon == "false") {
-      setState(() {
-        isSwitch1 = false;
-      });
+      if (mounted) {
+        setState(() {
+          isSwitch1 = false;
+
+          EasyLoading.dismiss();
+        });
+      }
     }
     // isSwitch1 = anon;
     print("dpppppp$isSwitch1");
@@ -161,39 +170,21 @@ class _SettingState extends State<Setting> {
                         Switch(
                           value: isSwitch1,
                           onChanged: (value) async {
-                            // output = await Anonynmous.choice(tkn);
-                            // intoggle();
                             print("switch is $isSwitch1");
-
-                            setState(() {
-                              // isSwitch = value;
-                              // isSwitch1 = value;
-                              // if (value == true) {
-                              //   setState(() {
-                              //     anon = "true";
-                              //   });
-                              //   print(";jjj$anon");
-                              // } else if (value == false) {
-                              //   setState(() {
-                              //     anon = "false";
-                              //   });
-                              //   print(";jjggg$anon");
-                              // }
-                              // print("isSwitch1$isSwitch1");
-                              // print("isSwitchhhhhhhhhhisSwitch$isSwitch");
-                            });
-
                             print("switch after $isSwitch1");
                             if (value == true) {
                               print("lllll$isSwitch1");
                               intoggle("true");
-
+                              EasyLoading.show();
+                              showAlertDialogss(context);
                               getdataanonmymous();
                               // setState(() {
                               //   isSwitch1 = value;
                               // });
                             } else if (value == false) {
                               intoggle("false");
+                              EasyLoading.show();
+
                               getdataanonmymous();
                               // setState(() {
                               //   isSwitch1 = value;
@@ -206,42 +197,7 @@ class _SettingState extends State<Setting> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: _heightScale * 60,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => BankDetails()));
 
-                        navi();
-                      },
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: _widthScale * 59,
-                          ),
-                          Text(
-                            "Bank Details",
-                            style: GoogleFonts.poppins(
-                              fontSize: _widthScale * 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(
-                            width: _widthScale * 135,
-                          ),
-                          Image.asset(
-                            "assets/Arrow 80.png",
-                            height: _heightScale * 20,
-                            width: _widthScale * 20,
-                            color: black(context),
-                          ),
-                        ],
-                      ),
-                    ),
                     SizedBox(
                       height: _heightScale * 60,
                     ),
@@ -252,7 +208,7 @@ class _SettingState extends State<Setting> {
                           width: _widthScale * 15,
                         ),
                         Icon(
-                          Icons.person_add_disabled,
+                          Icons.dark_mode,
                           color: text6,
                         ),
                         SizedBox(
@@ -285,6 +241,42 @@ class _SettingState extends State<Setting> {
                     SizedBox(
                       height: _heightScale * 60,
                     ),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => BankDetails()));
+
+                        navi();
+                      },
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: _widthScale * 15,
+                          ),
+                          Text(
+                            "Bank Details",
+                            style: GoogleFonts.poppins(
+                              fontSize: _widthScale * 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: _widthScale * 135,
+                          ),
+                          Image.asset(
+                            "assets/Arrow 80.png",
+                            height: _heightScale * 20,
+                            width: _widthScale * 20,
+                            color: black(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: _heightScale * 60,
+                    ),
                     // ElevatedButton(
                     //     onPressed: () {
                     //       setState(() {
@@ -303,5 +295,53 @@ class _SettingState extends State<Setting> {
         ),
       ),
     );
+  }
+
+  Future showAlertDialogss(BuildContext context) {
+    const double kDesignWidth = 375;
+    const double kDesignHeight = 812;
+    double _widthScale = MediaQuery.of(context).size.width / kDesignWidth;
+    double _heightScale = MediaQuery.of(context).size.height / kDesignHeight;
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_widthScale * 12),
+            ),
+            title: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "Information :",
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontSize: 18,
+                            color: black(context),
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Spacer(),
+                    GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: Icon(Icons.close)),
+                  ],
+                ),
+                SizedBox(
+                  height: _heightScale * 10,
+                ),
+                Text(
+                  "Enabling anonymous will make your name and profile picture hidden ",
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(fontSize: 14, color: black(context)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

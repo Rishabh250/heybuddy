@@ -215,20 +215,10 @@ class _Nav1State extends State<Nav1> {
                           SizedBox(
                             width: _widthScale * 84, //120,
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          Nav1(selectedIndex: 0)),
-                                  (route) => true);
-                            },
-                            child: Image.asset(
-                              "assets/hort2.png",
-                              height: _heightScale * 25,
-                              width: _widthScale * 115,
-                            ),
+                          Image.asset(
+                            "assets/hort2.png",
+                            height: _heightScale * 25,
+                            width: _widthScale * 115,
                           ),
                         ],
                       );

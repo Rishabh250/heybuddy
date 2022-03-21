@@ -136,7 +136,7 @@ class _OtpScreenState extends State<OtpScreen> {
               height: _heightScale * 15,
             ),
             Text(
-              "Enter the 6 digit code sent to your registered mobile number ",
+              "Enter the 6 digit code sent to your registered mobile number ${widget.phone} ",
               style: GoogleFonts.poppins(
                 textStyle: TextStyle(
                     color: black(context), fontSize: _widthScale * 15),

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heybuddy/Screens/aspirant_meeting_complete.dart';
 import 'package:heybuddy/Screens/homePage.dart';
@@ -9,7 +11,6 @@ import 'package:heybuddy/Screens/notifications.dart';
 import 'package:heybuddy/Screens/onboarding_Screen.dart';
 import 'package:heybuddy/Screens/professional_addComments.dart';
 import 'package:heybuddy/Screens/proff_cancle_booking.dart';
-
 import 'package:heybuddy/Screens/signup_email.dart';
 import 'package:heybuddy/Screens/slotbooktime.dart';
 import 'package:heybuddy/Screens/userprofile.dart';
@@ -17,6 +18,7 @@ import 'package:heybuddy/Screens/welcome.dart';
 import 'package:heybuddy/api/signin_api.dart';
 import 'package:heybuddy/notifications/notifications.dart';
 import 'package:heybuddy/provider/dark_theme_provider.dart';
+import 'package:heybuddy/provider/loading_indicator.dart';
 import 'package:heybuddy/provider/styles.dart';
 import 'package:heybuddy/shared_preference/shared_preference.dart';
 import 'package:heybuddy/shared_preference/shared_preference_login.dart';
@@ -73,24 +75,11 @@ Future<void> main() async {
     await localNotification.initializeLocalNotificationSettings();
   });
 
-  // _notificationHandler();
   FirebaseMessaging.onMessage.listen((event) async {
-    // prefs.setString('status', "Pending");
     localNotification.showNotification(event.notification);
   });
 
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // await flutterLocalNotificationsPlugin
-  //     .resolvePlatformSpecificImplementation<
-  //         AndroidFlutterLocalNotificationsPlugin>()
-  //     ?.createNotificationChannel(channel);
-
-  // await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-  //   alert: true,
-  //   badge: true,
-  //   sound: true,
-  // );
+  configLoading();
   runApp(
     ChangeNotifierProvider(
       create: (_) => Favourite(),
@@ -244,7 +233,14 @@ class _MyAppState extends State<MyApp> {
                   // dark: ThemeData.dark(),
                   // initial: AdaptiveThemeMode.system,
                   // builder: (light, dark) =>
-                  MaterialApp(
+                  GetMaterialApp(
+                builder: EasyLoading.init(builder: (context, builder) {
+                  final mediaQueryData = MediaQuery.of(context);
+                  return MediaQuery(
+                    child: builder!,
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                  );
+                }),
                 title: 'Flutter Demo',
                 //   initialRoute: val == true?"home":FirebaseAuth.instance.currentUser != null?"home":"/board",
                 // ? FirebaseAuth.instance.currentUser != null

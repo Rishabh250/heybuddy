@@ -147,11 +147,13 @@ class _SeeAllHistoryProfOnlyState extends State<SeeAllHistoryProfOnly> {
     });
     print("deluniis$id");
     delprofessionalhistory = await DeleteCompany.delete(id, tkn);
-    setState(() {
-      onTap();
-      ii = false;
-      iii = ii;
-    });
+    if (mounted) {
+      setState(() {
+        onTap();
+        ii = false;
+        iii = ii;
+      });
+    }
   }
 
   @override

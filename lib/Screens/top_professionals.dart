@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,51 +45,23 @@ class _TopProfessionalState extends State<TopProfessional> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getUsers(page);
-    // UserSecureStorage();
-    //  UserSecureStorage.getToken();
   }
 
   getUsers(page) async {
     res = await getProfessionalData(page);
-    setState(() {
-      filterUsers = res;
-    });
-    // setState(() {
-    //   //   data = response;
-    //   if (page > 1) {
-    //     print("me chla");
-    //     data.addAll(res);
-    //     filterUsers = [
-    //       ...filterUsers,
-    //       ...res,
-    //     ];
-    //     refreshController.loadComplete();
-    //   } else {
-    //     print("Done");
-    //     filterUsers = res;
-    //   }
-    //   EasyLoading.dismiss();
-    // });
+    if (mounted) {
+      setState(() {
+        filterUsers = res;
+      });
+    }
   }
 
   var output;
-// List z = [];
-//   getgh() async {
-//     z = ["company"];
-//     print("val of x is$z");
-//     return z;
-//   }
+
   var x;
   getgf() async {
-    // x = List.generate(
-    //     res[widget.i]["skills"] != null ? res[widget.i]["skills"].length : 0,
-    //     (index) => res[widget.i]["skills"]);
-    // // xy = res[widget.i]["skills"].length;
-    // print("val of x is$x");
-    // x = output[0]["skills"];
     return x;
   }
 
@@ -124,7 +98,7 @@ class _TopProfessionalState extends State<TopProfessional> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: _heightScale * 40,
+              height: _heightScale * 10,
             ),
             Row(
               children: [
@@ -167,28 +141,7 @@ class _TopProfessionalState extends State<TopProfessional> {
                               List ggg = [];
                               ggg = filterUsers[index]['company'];
                               return GestureDetector(
-                                onTap: () async {
-                                  // output = await UniqueUser.uniqueUser(
-                                  //     res[index]['phone']);
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) => UserProfile(
-                                  //             img: filterUsers[index]
-                                  //                         ["profilePic"] ==
-                                  //                     ""
-                                  //                 ? imggg
-                                  //                 : filterUsers[index]
-                                  //                     ["profilePic"],
-                                  //             uniqueid: filterUsers[index]
-                                  //                 ['phone'],
-                                  //             // bio: res[index]["bio"] == null
-                                  //             //     ? "Bio not added yet by professional"
-                                  //             //     : res[index]["bio"],
-                                  //             name: filterUsers[index]
-                                  //                 ["name"],
-                                  //             i: index)));
-                                },
+                                onTap: () async {},
                                 child: box2(
                                     "assets/Ellipse 9.png",
                                     // filterUsers[index]['profilePic'] != ""
